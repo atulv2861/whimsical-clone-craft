@@ -1,12 +1,50 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useEffect } from "react";
+import { Navbar } from "../components/Navbar";
+import { Hero } from "../components/Hero";
+import { Features } from "../components/Features";
+import { Footer } from "../components/Footer";
 
 const Index = () => {
+  useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+
+    // Set up reveal animation for elements with reveal-item class
+    const revealItems = document.querySelectorAll(".reveal-item");
+    
+    const revealOnScroll = () => {
+      revealItems.forEach((item) => {
+        const itemTop = item.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (itemTop < windowHeight - 60) {
+          item.classList.add("is-revealed");
+        }
+      });
+    };
+
+    // Run once on load
+    revealOnScroll();
+    
+    // Add scroll event listener
+    window.addEventListener("scroll", revealOnScroll);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener("scroll", revealOnScroll);
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-grow">
+        <Hero />
+        <Features />
+        {/* Add more sections as needed */}
+      </main>
+      <Footer />
     </div>
   );
 };

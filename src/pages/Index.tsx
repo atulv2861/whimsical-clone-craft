@@ -10,6 +10,18 @@ const Index = () => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
 
+    // Check for hash in URL and scroll to that section if present
+    const hash = window.location.hash;
+    if (hash) {
+      const id = hash.substring(1);
+      const element = document.getElementById(id);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+      }
+    }
+
     // Set up reveal animation for elements with reveal-item class
     const revealItems = document.querySelectorAll(".reveal-item");
     

@@ -15,7 +15,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       default: "bg-black text-white hover:opacity-90 transition-opacity",
       outline: "border border-black bg-transparent hover:bg-gray-50 transition-colors",
       text: "bg-transparent hover:bg-gray-50 transition-colors",
-      primary: "bg-black text-white hover:opacity-90 transition-opacity",
+      primary: "bg-purple-700 text-white hover:bg-purple-800 transition-colors",
       secondary: "bg-gray-100 text-black hover:bg-gray-200 transition-colors",
     };
 

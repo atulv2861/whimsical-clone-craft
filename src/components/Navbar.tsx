@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "./Button";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn, UserPlus } from "lucide-react";
 
 const navLinks = [
   { title: "Solutions", href: "#solutions" },
@@ -14,6 +14,8 @@ const navLinks = [
 export const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
+  const [showSignUpModal, setShowSignUpModal] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +30,31 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleSignIn = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // For demonstration, we'll just show an alert
+    alert("Sign in functionality would be implemented here");
+    setShowSignInModal(true);
+  };
+
+  const handleSignUp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // For demonstration, we'll just show an alert
+    alert("Sign up functionality would be implemented here");
+    setShowSignUpModal(true);
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    setIsMenuOpen(false);
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // If the section doesn't exist on this page, we can navigate to it
+      window.location.href = `/#${sectionId}`;
+    }
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -41,7 +68,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <span className="text-2xl font-bold">alice</span>
-              <span className="text-2xl text-gray-400">.</span>
+              <span className="text-2xl text-purple-400">.</span>
             </Link>
           </div>
 
@@ -51,6 +78,10 @@ export const Navbar: React.FC = () => {
               <a
                 key={link.title}
                 href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(link.href.substring(1));
+                }}
                 className="text-sm font-medium text-gray-700 hover:text-black transition-colors link-underline"
               >
                 {link.title}
@@ -59,11 +90,23 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="hidden md:flex md:items-center md:space-x-4">
-            <Button variant="outline" size="sm">
-              Sign In
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleSignIn}
+              className="flex items-center space-x-1"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Sign In</span>
             </Button>
-            <Button variant="primary" size="sm">
-              Get Started
+            <Button 
+              variant="primary" 
+              size="sm"
+              onClick={handleSignUp}
+              className="flex items-center space-x-1 bg-purple-700 hover:bg-purple-800"
+            >
+              <UserPlus className="h-4 w-4" />
+              <span>Get Started</span>
             </Button>
           </div>
 
@@ -95,7 +138,7 @@ export const Navbar: React.FC = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 <span className="text-2xl font-bold">alice</span>
-                <span className="text-2xl text-gray-400">.</span>
+                <span className="text-2xl text-purple-400">.</span>
               </Link>
               <button
                 className="text-gray-700 focus:outline-none"
@@ -111,21 +154,31 @@ export const Navbar: React.FC = () => {
                   key={link.title}
                   href={link.href}
                   className="text-lg font-medium text-gray-700 hover:text-black transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(link.href.substring(1));
+                  }}
                 >
                   {link.title}
                 </a>
               ))}
             </div>
             <div className="mt-auto flex flex-col space-y-4 pt-8">
-              <Button variant="outline" onClick={() => setIsMenuOpen(false)}>
-                Sign In
+              <Button 
+                variant="outline" 
+                onClick={handleSignIn}
+                className="flex items-center justify-center space-x-2"
+              >
+                <LogIn className="h-5 w-5" />
+                <span>Sign In</span>
               </Button>
               <Button
                 variant="primary"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={handleSignUp}
+                className="flex items-center justify-center space-x-2 bg-purple-700 hover:bg-purple-800"
               >
-                Get Started
+                <UserPlus className="h-5 w-5" />
+                <span>Get Started</span>
               </Button>
             </div>
           </div>

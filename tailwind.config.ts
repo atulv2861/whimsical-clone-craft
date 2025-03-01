@@ -62,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Flipkart specific colors
+				flipkart: {
+					blue: '#2874f0',
+					yellow: '#ff9f00',
+					green: '#388e3c',
+					gray: '#f1f3f6',
+					darkgray: '#878787',
+					black: '#212121',
 				}
 			},
 			borderRadius: {

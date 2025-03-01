@@ -4,6 +4,7 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 @layer base {
   :root {
@@ -97,32 +98,34 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-flipkart-gray text-flipkart-black;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 }
 
 @layer components {
-  .glass-panel {
-    @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-sm;
+  .flipkart-button {
+    @apply bg-flipkart-blue text-white px-4 py-2 rounded-sm font-medium hover:bg-blue-600 transition-colors;
   }
   
-  .fancy-blur-bg {
-    @apply relative;
+  .product-card {
+    @apply bg-white rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300;
   }
   
-  .fancy-blur-bg::before {
-    content: "";
-    @apply absolute -z-10 w-full h-full blur-3xl opacity-20 bg-gradient-to-r from-indigo-200 via-sky-100 to-violet-50;
-    transform: translateZ(0);
-  }
-
-  .text-balance {
-    text-wrap: balance;
+  .section-title {
+    @apply text-xl font-medium text-flipkart-black mb-4;
   }
   
-  .link-underline {
-    @apply relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-current after:transition-all after:duration-300 hover:after:w-full;
+  .product-img-container {
+    @apply relative overflow-hidden group;
+  }
+  
+  .product-img {
+    @apply transition-transform duration-300 group-hover:scale-105;
+  }
+  
+  .form-input {
+    @apply w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-flipkart-blue;
   }
 
   /* Smooth reveal animation for elements */
@@ -133,6 +136,23 @@
   .reveal-item.is-revealed {
     @apply opacity-100 translate-y-0;
   }
+}
+
+/* Specific Flipkart-like components */
+.category-card {
+  @apply flex flex-col items-center p-4 bg-white rounded hover:shadow-md transition-shadow;
+}
+
+.deal-banner {
+  @apply bg-gradient-to-r from-purple-600 to-flipkart-blue text-white p-4 rounded-md;
+}
+
+.price-tag {
+  @apply text-flipkart-black font-medium;
+}
+
+.discount-tag {
+  @apply text-flipkart-green text-sm ml-2;
 }
 
 /* Custom scrollbar */

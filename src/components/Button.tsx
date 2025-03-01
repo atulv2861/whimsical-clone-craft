@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "outline" | "text" | "primary" | "secondary";
+  variant?: "default" | "outline" | "text" | "primary" | "secondary" | "flipkart";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   children: React.ReactNode;
@@ -17,6 +17,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       text: "bg-transparent hover:bg-gray-50 transition-colors",
       primary: "bg-purple-700 text-white hover:bg-purple-800 transition-colors",
       secondary: "bg-gray-100 text-black hover:bg-gray-200 transition-colors",
+      flipkart: "bg-flipkart-blue text-white hover:bg-blue-600 transition-colors",
     };
 
     const sizes = {

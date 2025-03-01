@@ -1,0 +1,319 @@
+
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
+import { Navbar } from "@/components/ecommerce/Navbar";
+import { Star, ShoppingCart, Heart, Share2, TruckIcon, Shield, RotateCcw, Check } from "lucide-react";
+import { Button } from "@/components/Button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+
+// Mock data - in a real app this would come from an API
+const product = {
+  id: 1,
+  name: "Apple iPhone 13 (128GB) - Midnight",
+  description: "15 cm (6.1-inch) Super Retina XDR display, Cinematic mode adds shallow depth of field and shifts focus automatically in your videos, Advanced dual-camera system with 12MP Wide and Ultra Wide cameras; Photographic Styles, Smart HDR 4, Night mode, 4K Dolby Vision HDR recording.",
+  price: 59999,
+  originalPrice: 69900,
+  discount: "14% off",
+  rating: 4.7,
+  reviews: 23456,
+  inStock: true,
+  images: [
+    "https://images.unsplash.com/photo-1592750475357-74d8a6c7bd3f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    "https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+    "https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
+  ],
+  specifications: [
+    { category: "General", specs: [
+      { name: "Model Number", value: "iPhone 13" },
+      { name: "Color", value: "Midnight" },
+      { name: "SIM Type", value: "Dual Sim (Nano-SIM and eSIM)" }
+    ]},
+    { category: "Display", specs: [
+      { name: "Size", value: "6.1 inches" },
+      { name: "Resolution", value: "2532 x 1170 pixels at 460 ppi" },
+      { name: "Type", value: "Super Retina XDR OLED" }
+    ]},
+    { category: "Performance", specs: [
+      { name: "Processor", value: "A15 Bionic chip" },
+      { name: "RAM", value: "4 GB" },
+      { name: "Storage", value: "128 GB" }
+    ]}
+  ],
+  features: ["Face ID", "5G connectivity", "Ceramic Shield", "Water resistant", "iOS 15"],
+  seller: "Apple India",
+  warranty: "1 Year Warranty"
+};
+
+const ProductDetail = () => {
+  const { id } = useParams<{ id: string }>();
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const { toast } = useToast();
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  const handleAddToCart = () => {
+    toast({
+      title: "Added to cart",
+      description: `${product.name} (Qty: ${quantity}) has been added to your cart.`,
+      duration: 3000,
+    });
+  };
+
+  const handleBuyNow = () => {
+    toast({
+      title: "Proceeding to checkout",
+      description: "Redirecting to checkout page...",
+      duration: 3000,
+    });
+    // In a real app, we would redirect to checkout
+  };
+
+  const handleAddToWishlist = () => {
+    toast({
+      title: "Added to wishlist",
+      description: `${product.name} has been added to your wishlist.`,
+      duration: 3000,
+    });
+  };
+
+  const increaseQuantity = () => {
+    if (quantity < 10) {
+      setQuantity(quantity + 1);
+    }
+  };
+
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-grow bg-white">
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Product Images */}
+            <div className="flex flex-col-reverse md:flex-row md:space-x-4">
+              <div className="flex md:flex-col space-x-2 md:space-x-0 md:space-y-2 mt-2 md:mt-0">
+                {product.images.map((image, index) => (
+                  <div 
+                    key={index}
+                    className={`border rounded p-1 cursor-pointer ${selectedImage === index ? 'border-flipkart-blue' : 'border-gray-200'}`}
+                    onClick={() => setSelectedImage(index)}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`${product.name} - view ${index + 1}`}
+                      className="w-16 h-16 object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="flex-1 border rounded p-4 flex items-center justify-center relative">
+                <img 
+                  src={product.images[selectedImage]} 
+                  alt={product.name}
+                  className="max-h-80 md:max-h-96 object-contain"
+                />
+                <button 
+                  onClick={handleAddToWishlist}
+                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white border shadow-sm flex items-center justify-center"
+                >
+                  <Heart className="h-5 w-5 text-gray-500 hover:text-red-500" />
+                </button>
+              </div>
+            </div>
+
+            {/* Product Info */}
+            <div>
+              <h1 className="text-xl md:text-2xl font-medium mb-1">{product.name}</h1>
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="bg-flipkart-green text-white text-sm px-1.5 py-0.5 rounded flex items-center">
+                  {product.rating} <Star className="h-3 w-3 ml-0.5" fill="white" />
+                </div>
+                <span className="text-flipkart-darkgray text-sm">({product.reviews.toLocaleString()} ratings)</span>
+              </div>
+              <p className="text-flipkart-green font-medium mb-4">Special Price</p>
+              <div className="flex items-center mb-1">
+                <span className="text-flipkart-black text-2xl font-medium">{formatPrice(product.price)}</span>
+                <span className="text-gray-500 text-sm line-through ml-2">
+                  {formatPrice(product.originalPrice)}
+                </span>
+                <span className="text-flipkart-green text-sm ml-2">{product.discount}</span>
+              </div>
+              <p className="text-xs text-gray-500 mb-6">inclusive of all taxes</p>
+
+              {/* Delivery Options */}
+              <div className="bg-gray-50 p-4 rounded mb-6">
+                <div className="flex items-start mb-4">
+                  <TruckIcon className="h-5 w-5 text-gray-700 mt-0.5 mr-2" />
+                  <div>
+                    <h3 className="font-medium">Delivery</h3>
+                    <div className="flex items-center mt-2">
+                      <input 
+                        type="text" 
+                        placeholder="Enter pincode"
+                        className="p-1.5 text-sm border rounded w-32 focus:outline-none focus:ring-1 focus:ring-flipkart-blue"
+                      />
+                      <button className="text-flipkart-blue text-sm font-medium ml-2">Check</button>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">Usually delivered in 2 days</p>
+                  </div>
+                </div>
+                <div className="border-t border-gray-200 pt-3 flex space-x-6">
+                  <div className="flex items-center">
+                    <Shield className="h-4 w-4 text-gray-700 mr-1" />
+                    <span className="text-xs">1 Year Warranty</span>
+                  </div>
+                  <div className="flex items-center">
+                    <RotateCcw className="h-4 w-4 text-gray-700 mr-1" />
+                    <span className="text-xs">7 Days Replacement</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-4 w-4 text-gray-700 mr-1" />
+                    <span className="text-xs">Genuine Product</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Seller Info */}
+              <div className="mb-6">
+                <p className="text-sm">
+                  <span className="text-gray-600">Seller: </span>
+                  <span className="text-flipkart-blue font-medium">{product.seller}</span>
+                </p>
+              </div>
+
+              {/* Quantity Selector */}
+              <div className="flex items-center mb-6">
+                <span className="text-gray-600 mr-4">Quantity:</span>
+                <div className="flex items-center">
+                  <button 
+                    onClick={decreaseQuantity}
+                    className="w-8 h-8 border rounded-l flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                  <div className="w-10 h-8 border-t border-b flex items-center justify-center">
+                    {quantity}
+                  </div>
+                  <button 
+                    onClick={increaseQuantity}
+                    className="w-8 h-8 border rounded-r flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-4 mb-6">
+                <Button 
+                  variant="primary" 
+                  size="lg" 
+                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black flex justify-center items-center"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" /> ADD TO CART
+                </Button>
+                <Button 
+                  variant="primary" 
+                  size="lg" 
+                  className="flex-1 bg-flipkart-blue hover:bg-blue-600 flex justify-center items-center"
+                  onClick={handleBuyNow}
+                >
+                  BUY NOW
+                </Button>
+              </div>
+
+              {/* Share Button */}
+              <button className="flex items-center text-gray-600">
+                <Share2 className="h-4 w-4 mr-1" /> Share
+              </button>
+            </div>
+          </div>
+
+          {/* Product Details Tabs */}
+          <div className="mt-8">
+            <Tabs defaultValue="description">
+              <TabsList className="w-full justify-start border-b bg-transparent">
+                <TabsTrigger value="description" className="data-[state=active]:border-b-2 data-[state=active]:border-flipkart-blue rounded-none">
+                  Description
+                </TabsTrigger>
+                <TabsTrigger value="specifications" className="data-[state=active]:border-b-2 data-[state=active]:border-flipkart-blue rounded-none">
+                  Specifications
+                </TabsTrigger>
+                <TabsTrigger value="reviews" className="data-[state=active]:border-b-2 data-[state=active]:border-flipkart-blue rounded-none">
+                  Reviews
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="description" className="pt-4">
+                <h3 className="text-lg font-medium mb-4">Product Description</h3>
+                <p className="text-gray-700 mb-4">{product.description}</p>
+                <h4 className="font-medium mb-2">Key Features</h4>
+                <ul className="list-disc pl-5 text-gray-700">
+                  {product.features.map((feature, index) => (
+                    <li key={index} className="mb-1">{feature}</li>
+                  ))}
+                </ul>
+              </TabsContent>
+              <TabsContent value="specifications" className="pt-4">
+                <h3 className="text-lg font-medium mb-4">Technical Specifications</h3>
+                {product.specifications.map((category, index) => (
+                  <div key={index} className="mb-6">
+                    <h4 className="font-medium mb-2 border-b pb-2">{category.category}</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
+                      {category.specs.map((spec, i) => (
+                        <div key={i} className="flex">
+                          <span className="text-gray-600 w-40">{spec.name}</span>
+                          <span className="text-gray-900">{spec.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </TabsContent>
+              <TabsContent value="reviews" className="pt-4">
+                <div className="flex items-center mb-4">
+                  <div className="bg-flipkart-green text-white text-xl px-2 py-1 rounded flex items-center mr-4">
+                    {product.rating} <Star className="h-4 w-4 ml-1" fill="white" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{product.reviews.toLocaleString()} ratings & reviews</p>
+                    <p className="text-sm text-gray-500">Based on verified purchases</p>
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <Button variant="outline" size="sm">Write a Review</Button>
+                </div>
+                <div className="text-center py-8 text-gray-500">
+                  <p>Reviews will appear here after customers start posting them.</p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </main>
+
+      {/* Simple Footer */}
+      <footer className="bg-flipkart-black text-white py-4">
+        <div className="container mx-auto px-4 text-center text-sm">
+          &copy; {new Date().getFullYear()} Flipkart Clone. All rights reserved.
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default ProductDetail;

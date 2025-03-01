@@ -1,15 +1,9 @@
 
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils";
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export const Navbar = () => {
   const [isSearchFocused, setIsSearchFocused] = React.useState(false);
@@ -17,15 +11,18 @@ export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = React.useState(false);
   const moreDropdownRef = React.useRef<HTMLDivElement>(null);
+  const moreButtonRef = React.useRef<HTMLButtonElement>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   const categories = [
     { name: "Electronics", path: "/category/electronics" },
     { name: "Fashion", path: "/category/fashion" },
-    { name: "Home & Furniture", path: "/category/home" },
+    { name: "Home & Furniture", path: "/category/home-furniture" },
     { name: "Appliances", path: "/category/appliances" },
     { name: "Beauty & Personal Care", path: "/category/beauty" },
     { name: "Toys & Baby", path: "/category/toys" },
+    { name: "Mobiles", path: "/category/mobiles" },
   ];
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -63,6 +60,12 @@ export const Navbar = () => {
     e.preventDefault();
     // We would typically handle search here
     console.log("Searching for:", searchQuery);
+  };
+
+  const handleMoreItemClick = (path: string) => {
+    // Close dropdown and navigate
+    setIsMoreDropdownOpen(false);
+    navigate(path);
   };
 
   return (
@@ -136,7 +139,10 @@ export const Navbar = () => {
                 onMouseEnter={handleMoreMouseEnter}
                 onMouseLeave={handleMoreMouseLeave}
             >
-              <button className="flex items-center text-white">
+              <button 
+                ref={moreButtonRef}
+                className="flex items-center text-white"
+              >
                 <span>More</span>
                 <ChevronDown className="h-4 w-4 ml-1" />
               </button>
@@ -147,24 +153,24 @@ export const Navbar = () => {
                   onMouseEnter={handleDropdownMouseEnter}
                   onMouseLeave={handleDropdownMouseLeave}
                 >
-                  <Link
-                    to="/"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  <button
+                    onClick={() => handleMoreItemClick("/my-orders")}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     My Orders
-                  </Link>
-                  <Link
-                    to="/"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  </button>
+                  <button
+                    onClick={() => handleMoreItemClick("/wishlist")}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Wishlist
-                  </Link>
-                  <Link
-                    to="/"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  </button>
+                  <button
+                    onClick={() => handleMoreItemClick("/profile")}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Profile
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>
@@ -226,6 +232,7 @@ export const Navbar = () => {
                 <Link
                   to="/login"
                   className="block p-2 rounded text-flipkart-blue font-medium"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Login
                 </Link>
@@ -234,8 +241,9 @@ export const Navbar = () => {
                   {categories.map((category) => (
                     <Link
                       key={category.name}
-                      to="/"
+                      to={category.path}
                       className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       {category.name}
                     </Link>
@@ -243,20 +251,23 @@ export const Navbar = () => {
                 </div>
                 <div className="border-t border-gray-200 py-3">
                   <Link
-                    to="/"
+                    to="/my-orders"
                     className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     My Orders
                   </Link>
                   <Link
-                    to="/"
+                    to="/wishlist"
                     className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     Wishlist
                   </Link>
                   <Link
-                    to="/"
+                    to="/profile"
                     className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     My Profile
                   </Link>

@@ -15,6 +15,10 @@ import ProductDetail from "./pages/ECommerce/ProductDetail";
 import Login from "./pages/ECommerce/Login";
 import SignUp from "./pages/ECommerce/SignUp";
 import Cart from "./pages/ECommerce/Cart";
+import MyOrders from "./pages/ECommerce/MyOrders";
+import Wishlist from "./pages/ECommerce/Wishlist";
+import Profile from "./pages/ECommerce/Profile";
+import CategoryPage from "./pages/ECommerce/CategoryPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +38,10 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/category/:categoryName" element={<CategoryPage />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

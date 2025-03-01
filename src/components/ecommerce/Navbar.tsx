@@ -4,11 +4,19 @@ import { Link } from "react-router-dom";
 import { Search, ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const Navbar = () => {
   const [isSearchFocused, setIsSearchFocused] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = React.useState(false);
+  const moreDropdownRef = React.useRef<HTMLDivElement>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
 
   const categories = [
@@ -21,6 +29,35 @@ export const Navbar = () => {
   ];
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  let dropdownTimeout: NodeJS.Timeout | null = null;
+
+  const handleMoreMouseEnter = () => {
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout);
+      dropdownTimeout = null;
+    }
+    setIsMoreDropdownOpen(true);
+  };
+
+  const handleMoreMouseLeave = () => {
+    dropdownTimeout = setTimeout(() => {
+      setIsMoreDropdownOpen(false);
+    }, 300); // Delay before hiding
+  };
+
+  const handleDropdownMouseEnter = () => {
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout);
+      dropdownTimeout = null;
+    }
+  };
+
+  const handleDropdownMouseLeave = () => {
+    dropdownTimeout = setTimeout(() => {
+      setIsMoreDropdownOpen(false);
+    }, 300); // Delay before hiding
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,31 +132,41 @@ export const Navbar = () => {
               <ShoppingCart className="h-5 w-5 mr-1" />
               <span>Cart</span>
             </Link>
-            <div className="relative group">
+            <div className="relative" 
+                onMouseEnter={handleMoreMouseEnter}
+                onMouseLeave={handleMoreMouseLeave}
+            >
               <button className="flex items-center text-white">
                 <span>More</span>
                 <ChevronDown className="h-4 w-4 ml-1" />
               </button>
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg py-2 z-10 hidden group-hover:block">
-                <Link
-                  to="/orders"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              {isMoreDropdownOpen && (
+                <div 
+                  ref={moreDropdownRef}
+                  className="absolute right-0 mt-2 w-48 bg-white rounded shadow-lg py-2 z-50"
+                  onMouseEnter={handleDropdownMouseEnter}
+                  onMouseLeave={handleDropdownMouseLeave}
                 >
-                  My Orders
-                </Link>
-                <Link
-                  to="/wishlist"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Wishlist
-                </Link>
-                <Link
-                  to="/profile"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  Profile
-                </Link>
-              </div>
+                  <Link
+                    to="/"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    My Orders
+                  </Link>
+                  <Link
+                    to="/"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Wishlist
+                  </Link>
+                  <Link
+                    to="/"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Profile
+                  </Link>
+                </div>
+              )}
             </div>
           </nav>
 
@@ -187,7 +234,7 @@ export const Navbar = () => {
                   {categories.map((category) => (
                     <Link
                       key={category.name}
-                      to={category.path}
+                      to="/"
                       className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
                     >
                       {category.name}
@@ -196,19 +243,19 @@ export const Navbar = () => {
                 </div>
                 <div className="border-t border-gray-200 py-3">
                   <Link
-                    to="/orders"
+                    to="/"
                     className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
                   >
                     My Orders
                   </Link>
                   <Link
-                    to="/wishlist"
+                    to="/"
                     className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
                   >
                     Wishlist
                   </Link>
                   <Link
-                    to="/profile"
+                    to="/"
                     className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
                   >
                     My Profile

@@ -50,7 +50,12 @@ export const Navbar: React.FC = () => {
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
     } else {
-      // If the section doesn't exist on this page, we can navigate to it
+      // If we're on the home page but section doesn't exist yet
+      if (window.location.pathname === '/') {
+        // Just close the menu, we're already on the homepage
+        return;
+      }
+      // If we're not on the home page, navigate to it
       window.location.href = `/#${sectionId}`;
     }
   };

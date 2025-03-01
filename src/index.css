@@ -117,11 +117,16 @@
   }
   
   .product-img-container {
-    @apply relative overflow-hidden group;
+    @apply relative overflow-hidden;
   }
   
   .product-img {
-    @apply transition-transform duration-300 group-hover:scale-105;
+    @apply transition-transform duration-300;
+  }
+  
+  /* Add this as a separate class that can be used with group */
+  .group:hover .product-img {
+    @apply scale-105;
   }
   
   .form-input {

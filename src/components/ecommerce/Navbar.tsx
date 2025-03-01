@@ -219,18 +219,7 @@ export const Navbar = () => {
           </div>
         )}
 
-        {/* Categories row - only on desktop */}
-        <div className="hidden md:flex bg-white h-10 items-center px-4 overflow-x-auto">
-          {categories.map((category, index) => (
-            <Link
-              key={index}
-              to={category.path}
-              className="whitespace-nowrap px-3 py-1 text-sm font-medium text-gray-800 hover:text-flipkart-blue"
-            >
-              {category.name}
-            </Link>
-          ))}
-        </div>
+        {/* Categories row removed - now using the separate CategoriesTab component */}
       </div>
     </header>
   );

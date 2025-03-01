@@ -1,6 +1,7 @@
 
 import React, { useEffect } from "react";
 import { Navbar } from "@/components/ecommerce/Navbar";
+import { CategoriesTab } from "@/components/ecommerce/CategoriesTab";
 import { Carousel } from "@/components/ui/carousel";
 import { CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -127,6 +128,7 @@ const Home = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <CategoriesTab />
       <main className="flex-grow">
         {/* Hero Banner Carousel */}
         <section className="mb-4">

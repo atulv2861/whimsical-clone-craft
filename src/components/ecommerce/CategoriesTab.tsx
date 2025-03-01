@@ -17,8 +17,8 @@ const categories = [
 export const CategoriesTab = () => {
   return (
     <div className="bg-white shadow-sm">
-      <div className="container mx-auto overflow-x-auto">
-        <div className="flex space-x-1 py-2 px-4">
+      <div className="container mx-auto">
+        <div className="flex flex-wrap py-2 px-4">
           {categories.map((category, index) => (
             <Link
               key={index}

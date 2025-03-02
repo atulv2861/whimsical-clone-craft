@@ -26,6 +26,8 @@ import AboutPage from "./pages/ECommerce/AboutPage";
 import ContactPage from "./pages/ECommerce/ContactPage";
 import SearchPage from "./pages/ECommerce/SearchPage";
 import BasicPage from "./pages/ECommerce/BasicPage";
+import DealsPage from "./pages/ECommerce/DealsPage";
+import TrendingPage from "./pages/ECommerce/TrendingPage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,8 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/category/:categoryName" element={<CategoryPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/deals" element={<DealsPage />} />
+            <Route path="/trending" element={<TrendingPage />} />
             
             {/* New Pages */}
             <Route path="/about" element={<AboutPage />} />

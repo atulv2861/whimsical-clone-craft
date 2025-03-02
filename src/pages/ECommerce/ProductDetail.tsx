@@ -6,6 +6,8 @@ import { Star, ShoppingCart, Heart, Share2, TruckIcon, Shield, RotateCcw, Check 
 import { Button } from "@/components/Button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
+import Footer from "@/components/ecommerce/Footer";
 
 // Mock data - in a real app this would come from an API
 const product = {
@@ -51,6 +53,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const { toast } = useToast();
+  const { addToCart } = useCart();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -61,20 +64,26 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    toast({
-      title: "Added to cart",
-      description: `${product.name} (Qty: ${quantity}) has been added to your cart.`,
-      duration: 3000,
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.images[0]
     });
   };
 
   const handleBuyNow = () => {
-    toast({
-      title: "Proceeding to checkout",
-      description: "Redirecting to checkout page...",
-      duration: 3000,
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.images[0]
     });
-    // In a real app, we would redirect to checkout
+    
+    // Navigate to cart page
+    window.location.href = '/cart';
   };
 
   const handleAddToWishlist = () => {
@@ -222,7 +231,7 @@ const ProductDetail = () => {
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black flex justify-center items-center"
+                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black flex items-center justify-center"
                   onClick={handleAddToCart}
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" /> ADD TO CART
@@ -230,7 +239,7 @@ const ProductDetail = () => {
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  className="flex-1 bg-flipkart-blue hover:bg-blue-600 flex justify-center items-center"
+                  className="flex-1 bg-flipkart-blue hover:bg-blue-600 flex items-center justify-center"
                   onClick={handleBuyNow}
                 >
                   BUY NOW
@@ -305,13 +314,7 @@ const ProductDetail = () => {
           </div>
         </div>
       </main>
-
-      {/* Simple Footer */}
-      <footer className="bg-flipkart-black text-white py-4">
-        <div className="container mx-auto px-4 text-center text-sm">
-          &copy; {new Date().getFullYear()} Flipkart Clone. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

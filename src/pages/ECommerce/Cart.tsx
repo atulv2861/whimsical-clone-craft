@@ -1,52 +1,15 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/ecommerce/Navbar";
 import { Button } from "@/components/Button";
 import { Trash2, Plus, Minus, ShieldCheck, TruckIcon } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-
-// Mock data for cart items
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Apple iPhone 13 (128GB) - Midnight",
-    price: 59999,
-    originalPrice: 69900,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1592750475357-74d8a6c7bd3f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-  },
-  {
-    id: 2,
-    name: "Sony WH-1000XM4 Noise Cancelling Wireless Headphones",
-    price: 29990,
-    originalPrice: 32990,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3"
-  }
-];
+import { useCart } from "@/contexts/CartContext";
+import Footer from "@/components/ecommerce/Footer";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { cartItems, removeFromCart, updateQuantity, subtotal, discount, total } = useCart();
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1 || newQuantity > 10) return;
-    
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-    toast({
-      title: "Item removed",
-      description: "Item has been removed from your cart",
-      duration: 3000,
-    });
-  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -56,17 +19,7 @@ const Cart = () => {
     }).format(price);
   };
 
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const discount = cartItems.reduce((total, item) => total + ((item.originalPrice - item.price) * item.quantity), 0);
-  const deliveryCharge = 0; // Free delivery for demo
-  const total = subtotal - discount + deliveryCharge;
-
   const handleCheckout = () => {
-    toast({
-      title: "Proceeding to checkout",
-      description: "Redirecting to checkout page...",
-      duration: 3000,
-    });
     navigate("/checkout");
   };
 
@@ -95,7 +48,7 @@ const Cart = () => {
               {cartItems.length === 0 ? (
                 <div className="text-center py-12">
                   <img 
-                    src="https://images.unsplash.com/photo-1535227798054-e4373ef3795a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
+                    src="https://images.unsplash.com/photo-1628102491629-778571d893a3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" 
                     alt="Empty Cart" 
                     className="h-40 mx-auto mb-4 opacity-70"
                   />
@@ -153,7 +106,7 @@ const Cart = () => {
                               </button>
                             </div>
                             <button 
-                              onClick={() => removeItem(item.id)}
+                              onClick={() => removeFromCart(item.id)}
                               className="text-gray-500 hover:text-flipkart-blue flex items-center"
                             >
                               <Trash2 className="h-4 w-4 mr-1" />
@@ -219,13 +172,7 @@ const Cart = () => {
           )}
         </div>
       </main>
-
-      {/* Simple Footer */}
-      <footer className="bg-flipkart-black text-white py-4">
-        <div className="container mx-auto px-4 text-center text-sm">
-          &copy; {new Date().getFullYear()} Flipkart Clone. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

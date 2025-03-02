@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Navbar } from "@/components/ecommerce/Navbar";
 import { CategoriesTab } from "@/components/ecommerce/CategoriesTab";
@@ -8,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingBag, Heart, Star, TrendingUp } from "lucide-react";
 import { Button } from "@/components/Button";
 import { Link } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 const categories = [
   { id: 1, name: "Mobiles", image: "https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3" },
@@ -19,9 +21,9 @@ const categories = [
 ];
 
 const banners = [
-  { id: 1, image: "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", alt: "Sale Banner" },
-  { id: 2, image: "https://images.unsplash.com/photo-1607083206325-caf1edba7a0f?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", alt: "Electronics Sale" },
-  { id: 3, image: "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", alt: "Fashion Sale" },
+  { id: 1, image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", alt: "Sale Banner" },
+  { id: 2, image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", alt: "Electronics Sale" },
+  { id: 3, image: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3", alt: "Fashion Sale" },
 ];
 
 const featuredProducts = [
@@ -88,6 +90,8 @@ const featuredProducts = [
 ];
 
 const Home = () => {
+  const { addToCart } = useCart();
+  
   useEffect(() => {
     window.scrollTo(0, 0);
     
@@ -119,6 +123,16 @@ const Home = () => {
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(price);
+  };
+
+  const handleAddToCart = (product: typeof featuredProducts[0]) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.image,
+    });
   };
 
   return (
@@ -260,9 +274,10 @@ const Home = () => {
                     <Button 
                       variant="primary" 
                       size="sm" 
-                      className="w-full bg-flipkart-yellow hover:bg-yellow-500 text-black flex justify-center items-center"
+                      className="w-full bg-flipkart-yellow hover:bg-yellow-500 text-black flex items-center justify-center"
+                      onClick={() => handleAddToCart(product)}
                     >
-                      <ShoppingBag className="h-4 w-4 mr-1" /> ADD TO CART
+                      <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
                     </Button>
                   </div>
                 </div>
@@ -272,7 +287,12 @@ const Home = () => {
         </section>
 
         <section className="mb-8 container mx-auto px-4">
-          <div className="deal-banner rounded-md p-6 reveal-item">
+          <div className="deal-banner rounded-md p-6 reveal-item" style={{
+            backgroundImage: "linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%), url('https://images.unsplash.com/photo-1527576539890-dfa815648363?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            color: "white"
+          }}>
             <h2 className="text-xl md:text-2xl font-bold mb-2">BIGGEST DEALS ON TOP BRANDS</h2>
             <p className="mb-4">Up to 80% off on Electronics, Fashion, and more</p>
             <Button variant="primary" size="lg" className="bg-white text-flipkart-blue hover:bg-gray-100">

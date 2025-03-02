@@ -27,6 +27,40 @@ const BasicPage = () => {
 
   const displayTitle = formatTitle(pageTitle);
 
+  // Mock content based on page type
+  const getPageContent = () => {
+    switch(path) {
+      case 'payments':
+        return "We accept various payment methods including Credit/Debit Cards, UPI, Net Banking, EMI, and Cash on Delivery. All transactions are secure and encrypted.";
+      case 'shipping':
+        return "We offer fast and reliable shipping across India. Standard delivery typically takes 2-4 business days, while express delivery is available for select pincode areas.";
+      case 'returns':
+        return "Easy returns within 30 days of purchase. Initiate a return from your order history, and our team will assist you with the return process.";
+      case 'faq':
+        return "Find answers to commonly asked questions about orders, delivery, returns, payments, and more. If you can't find what you're looking for, please contact our customer support.";
+      case 'return-policy':
+        return "Our hassle-free 30-day return policy allows you to return any item in its original condition. Refunds are typically processed within 5-7 business days after we receive the returned item.";
+      case 'terms':
+        return "By using our website, you agree to our terms and conditions. These include guidelines for using our services, intellectual property rights, liability limitations, and dispute resolution procedures.";
+      case 'security':
+        return "We employ industry-standard security measures to protect your data. All transactions are encrypted, and we never store your full payment details on our servers.";
+      case 'privacy':
+        return "Your privacy is important to us. We collect only essential information needed to process your orders and improve your shopping experience. We never sell your personal data to third parties.";
+      case 'careers':
+        return "Join our growing team of talented individuals. We offer competitive compensation, a positive work culture, and opportunities for professional growth.";
+      case 'press':
+        return "Find the latest news, press releases, and media resources about our company. For press inquiries, please contact our media relations team.";
+      case 'corporate':
+        return "Learn about our company's mission, vision, and values. Our corporate responsibility initiatives focus on sustainability, community engagement, and ethical business practices.";
+      case 'report':
+        return "Report issues with products, service, or website functionality. Your feedback helps us improve our services for all customers.";
+      case 'site-map':
+        return "Navigate through all sections of our website with our comprehensive site map. Find categories, product pages, and information resources easily.";
+      default:
+        return "This page contains information about " + displayTitle.toLowerCase() + ". We are currently working on adding more detailed content to this page.";
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -37,8 +71,7 @@ const BasicPage = () => {
           <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
             <h2 className="text-xl font-semibold mb-4">{displayTitle} Information</h2>
             <p className="text-gray-700 mb-4">
-              This page contains information about {displayTitle.toLowerCase()}.
-              We are currently working on adding more detailed content to this page.
+              {getPageContent()}
             </p>
             <p className="text-gray-700">
               Thank you for your patience as we continue to improve our website.

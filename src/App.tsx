@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { CartProvider } from "@/contexts/CartContext";
 
 // Original pages
 import Index from "./pages/Index";
@@ -29,48 +30,50 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Original app route */}
-          <Route path="/original" element={<Index />} />
-          
-          {/* E-commerce routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/my-orders" element={<MyOrders />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/category/:categoryName" element={<CategoryPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          
-          {/* New Pages */}
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          
-          {/* Basic Page routes for footer links */}
-          <Route path="/payments" element={<BasicPage />} />
-          <Route path="/shipping" element={<BasicPage />} />
-          <Route path="/returns" element={<BasicPage />} />
-          <Route path="/faq" element={<BasicPage />} />
-          <Route path="/return-policy" element={<BasicPage />} />
-          <Route path="/terms" element={<BasicPage />} />
-          <Route path="/security" element={<BasicPage />} />
-          <Route path="/privacy" element={<BasicPage />} />
-          <Route path="/careers" element={<BasicPage />} />
-          <Route path="/press" element={<BasicPage />} />
-          <Route path="/corporate" element={<BasicPage />} />
-          <Route path="/report" element={<BasicPage />} />
-          <Route path="/site-map" element={<BasicPage />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <CartProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Original app route */}
+            <Route path="/original" element={<Index />} />
+            
+            {/* E-commerce routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/category/:categoryName" element={<CategoryPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            
+            {/* New Pages */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            
+            {/* Basic Page routes for footer links */}
+            <Route path="/payments" element={<BasicPage />} />
+            <Route path="/shipping" element={<BasicPage />} />
+            <Route path="/returns" element={<BasicPage />} />
+            <Route path="/faq" element={<BasicPage />} />
+            <Route path="/return-policy" element={<BasicPage />} />
+            <Route path="/terms" element={<BasicPage />} />
+            <Route path="/security" element={<BasicPage />} />
+            <Route path="/privacy" element={<BasicPage />} />
+            <Route path="/careers" element={<BasicPage />} />
+            <Route path="/press" element={<BasicPage />} />
+            <Route path="/corporate" element={<BasicPage />} />
+            <Route path="/report" element={<BasicPage />} />
+            <Route path="/site-map" element={<BasicPage />} />
+            
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </CartProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

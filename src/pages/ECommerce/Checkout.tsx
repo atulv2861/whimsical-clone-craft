@@ -1,44 +1,42 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/ecommerce/Navbar";
-import { Button } from "@/components/Button";
-import { useCart } from "@/contexts/CartContext";
-import { 
-  CreditCard, CheckCircle, MapPin, Truck, Calendar, 
-  AlertCircle, Home, Building, PlusCircle, Edit, Trash2 
-} from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import Footer from "@/components/ecommerce/Footer";
-import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { Check, MapPin, CreditCard, Truck, ChevronRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Checkout = () => {
   const { cartItems, subtotal, discount, total, clearCart } = useCart();
-  const [step, setStep] = useState(1);
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      phone: "9876543210",
-      address: "123 Main Street, Apartment 4B",
-      city: "Bangalore",
-      state: "Karnataka",
-      pincode: "560001",
-      isDefault: true,
-      type: "home" as const
-    }
-  ]);
-  const [selectedAddressId, setSelectedAddressId] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "cod" | "upi">("card");
-  const [cardDetails, setCardDetails] = useState({
-    number: "",
-    name: "",
-    expiry: "",
-    cvv: ""
-  });
-  const [upiId, setUpiId] = useState("");
-  
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const [step, setStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Address form state
+  const [address, setAddress] = useState({
+    fullName: "",
+    phone: "",
+    pincode: "",
+    locality: "",
+    address: "",
+    city: "",
+    state: "",
+    landmark: "",
+    addressType: "home",
+  });
+
+  // Payment info state
+  const [paymentInfo, setPaymentInfo] = useState({
+    cardNumber: "",
+    nameOnCard: "",
+    expiry: "",
+    cvv: "",
+  });
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -48,455 +46,431 @@ const Checkout = () => {
     }).format(price);
   };
 
-  const handleAddressSelect = (id: number) => {
-    setSelectedAddressId(id);
-  };
-
-  const handlePaymentMethodSelect = (method: "card" | "cod" | "upi") => {
-    setPaymentMethod(method);
-  };
-
-  const handleCardDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setCardDetails(prev => ({ ...prev, [name]: value }));
+    setAddress(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePlaceOrder = () => {
-    // In a real app, this would handle payment processing and order creation
-    toast({
-      title: "Order placed successfully!",
-      description: "Thank you for your purchase.",
-      duration: 5000,
-    });
-    
-    // Clear cart and redirect to a success page or order history
-    clearCart();
-    setTimeout(() => navigate("/my-orders"), 1500);
+  const handlePaymentInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPaymentInfo(prev => ({ ...prev, [name]: value }));
   };
 
-  const isStepComplete = (currentStep: number) => {
-    if (currentStep === 1) {
-      return selectedAddressId !== 0;
+  const handleAddressSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!address.fullName || !address.phone || !address.pincode || !address.address || !address.city || !address.state) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
     }
-    if (currentStep === 2) {
-      if (paymentMethod === "card") {
-        return cardDetails.number && cardDetails.name && cardDetails.expiry && cardDetails.cvv;
-      }
-      if (paymentMethod === "upi") {
-        return upiId.length > 0;
-      }
-      return true; // For COD
-    }
-    return false;
+    setStep(2);
   };
+
+  const handlePaymentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (paymentMethod === "card") {
+      if (!paymentInfo.cardNumber || !paymentInfo.nameOnCard || !paymentInfo.expiry || !paymentInfo.cvv) {
+        toast({
+          title: "Error",
+          description: "Please fill in all card details",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    processPayment();
+  };
+
+  const processPayment = () => {
+    setIsProcessing(true);
+    // Simulate payment processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      toast({
+        title: "Order Placed!",
+        description: "Your order has been successfully placed.",
+      });
+      clearCart();
+      navigate("/my-orders");
+    }, 2000);
+  };
+
+  if (cartItems.length === 0) {
+    navigate("/cart");
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <main className="flex-grow container mx-auto py-6 px-4">
-        {cartItems.length === 0 ? (
-          <div className="text-center py-12">
-            <img 
-              src="https://cdn-icons-png.flaticon.com/512/3500/3500855.png" 
-              alt="Empty Cart" 
-              className="h-24 mx-auto mb-4 opacity-70"
-            />
-            <h2 className="text-xl font-medium mb-2">Your cart is empty!</h2>
-            <p className="text-gray-500 mb-6">Add items to your cart to checkout</p>
-            <Link to="/">
-              <Button variant="flipkart">Continue Shopping</Button>
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Checkout Steps Container */}
-            <div className="lg:col-span-2">
-              {/* Progress Indicator */}
-              <div className="bg-white rounded shadow p-4 mb-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-8 h-8 rounded-full ${step >= 1 ? 'bg-flipkart-blue text-white' : 'bg-gray-200'} flex items-center justify-center mb-1`}>
-                      <MapPin className="h-4 w-4" />
-                    </div>
-                    <span className="text-xs font-medium">Address</span>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Checkout</h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main content */}
+          <div className="lg:col-span-2">
+            {/* Checkout steps */}
+            <div className="bg-white rounded-lg shadow-sm mb-6">
+              <div className="p-4 border-b">
+                <div className="flex items-center">
+                  <div className={`flex items-center justify-center rounded-full w-8 h-8 ${step >= 1 ? 'bg-flipkart-blue text-white' : 'bg-gray-200 text-gray-400'}`}>
+                    {step > 1 ? <Check className="h-5 w-5" /> : 1}
                   </div>
-                  <div className={`flex-1 h-1 mx-2 ${step >= 2 ? 'bg-flipkart-blue' : 'bg-gray-200'}`}></div>
-                  <div className="flex flex-col items-center">
-                    <div className={`w-8 h-8 rounded-full ${step >= 2 ? 'bg-flipkart-blue text-white' : 'bg-gray-200'} flex items-center justify-center mb-1`}>
-                      <CreditCard className="h-4 w-4" />
-                    </div>
-                    <span className="text-xs font-medium">Payment</span>
-                  </div>
-                  <div className={`flex-1 h-1 mx-2 ${step >= 3 ? 'bg-flipkart-blue' : 'bg-gray-200'}`}></div>
-                  <div className="flex flex-col items-center">
-                    <div className={`w-8 h-8 rounded-full ${step >= 3 ? 'bg-flipkart-blue text-white' : 'bg-gray-200'} flex items-center justify-center mb-1`}>
-                      <CheckCircle className="h-4 w-4" />
-                    </div>
-                    <span className="text-xs font-medium">Confirmation</span>
+                  <div className="ml-3">
+                    <h3 className="font-medium">Delivery Address</h3>
                   </div>
                 </div>
               </div>
-
-              {/* Step 1: Delivery Address */}
+              
               {step === 1 && (
-                <div className="bg-white rounded shadow p-4 mb-6">
-                  <h2 className="text-lg font-medium mb-4">Delivery Address</h2>
-                  
-                  <div className="space-y-4">
-                    {addresses.map(address => (
-                      <div 
-                        key={address.id} 
-                        className={`border p-3 rounded ${selectedAddressId === address.id ? 'border-flipkart-blue bg-blue-50' : 'border-gray-200'}`}
-                      >
-                        <div className="flex items-start">
-                          <input 
-                            type="radio" 
-                            name="address" 
-                            id={`address-${address.id}`}
-                            checked={selectedAddressId === address.id}
-                            onChange={() => handleAddressSelect(address.id)}
-                            className="mt-1 mr-3"
-                          />
-                          <div className="flex-1">
-                            <div className="flex justify-between items-center mb-1">
-                              <div className="flex items-center">
-                                <p className="font-medium">{address.name}</p>
-                                <span className={`ml-2 text-xs px-2 py-0.5 rounded ${address.type === 'home' ? 'bg-flipkart-blue text-white' : 'bg-yellow-100 text-yellow-800'}`}>
-                                  {address.type === 'home' ? 'HOME' : 'WORK'}
-                                </span>
-                                {address.isDefault && (
-                                  <span className="ml-2 text-xs text-gray-500">Default</span>
-                                )}
-                              </div>
-                              <div className="flex space-x-2">
-                                <button className="text-flipkart-blue">
-                                  <Edit className="h-4 w-4" />
-                                </button>
-                                <button className="text-red-500">
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-700">{address.phone}</p>
-                            <p className="text-sm text-gray-700 mt-1">
-                              {address.address}, {address.city}, {address.state} - {address.pincode}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    <div className="border border-dashed border-gray-300 p-3 rounded">
-                      <div className="flex items-center text-flipkart-blue cursor-pointer">
-                        <PlusCircle className="h-5 w-5 mr-2" />
-                        <span>Add a new address</span>
-                      </div>
+                <form onSubmit={handleAddressSubmit} className="p-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name*</label>
+                      <input
+                        type="text"
+                        name="fullName"
+                        value={address.fullName}
+                        onChange={handleAddressChange}
+                        className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number*</label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={address.phone}
+                        onChange={handleAddressChange}
+                        className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                      />
                     </div>
                   </div>
-
-                  <div className="mt-6 flex justify-end">
-                    <Button
-                      variant="flipkart"
-                      disabled={!isStepComplete(1)}
-                      onClick={() => setStep(2)}
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Pincode*</label>
+                      <input
+                        type="text"
+                        name="pincode"
+                        value={address.pincode}
+                        onChange={handleAddressChange}
+                        className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Locality</label>
+                      <input
+                        type="text"
+                        name="locality"
+                        value={address.locality}
+                        onChange={handleAddressChange}
+                        className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Address (Area and Street)*</label>
+                    <textarea
+                      name="address"
+                      value={address.address}
+                      onChange={handleAddressChange}
+                      className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      rows={3}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">City/District/Town*</label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={address.city}
+                        onChange={handleAddressChange}
+                        className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">State*</label>
+                      <select
+                        name="state"
+                        value={address.state}
+                        onChange={handleAddressChange}
+                        className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        required
+                      >
+                        <option value="">Select State</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Landmark (Optional)</label>
+                    <input
+                      type="text"
+                      name="landmark"
+                      value={address.landmark}
+                      onChange={handleAddressChange}
+                      className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                  </div>
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Address Type</label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="addressType"
+                          value="home"
+                          checked={address.addressType === "home"}
+                          onChange={handleAddressChange}
+                          className="mr-2"
+                        />
+                        Home
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name="addressType"
+                          value="work"
+                          checked={address.addressType === "work"}
+                          onChange={handleAddressChange}
+                          className="mr-2"
+                        />
+                        Work
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <Button 
+                      type="submit"
+                      className="bg-flipkart-blue hover:bg-flipkart-blue/90"
                     >
-                      DELIVER TO THIS ADDRESS
+                      CONTINUE
                     </Button>
                   </div>
-                </div>
+                </form>
               )}
+            </div>
 
-              {/* Step 2: Payment Options */}
+            {/* Payment Step */}
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="p-4 border-b">
+                <div className="flex items-center">
+                  <div className={`flex items-center justify-center rounded-full w-8 h-8 ${step >= 2 ? 'bg-flipkart-blue text-white' : 'bg-gray-200 text-gray-400'}`}>
+                    {step > 2 ? <Check className="h-5 w-5" /> : 2}
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="font-medium">Payment Method</h3>
+                  </div>
+                </div>
+              </div>
+              
               {step === 2 && (
-                <div className="bg-white rounded shadow p-4 mb-6">
-                  <h2 className="text-lg font-medium mb-4">Payment Options</h2>
-                  
-                  <div className="space-y-4">
-                    {/* Credit/Debit Card */}
-                    <div className="border rounded">
-                      <div 
-                        className={`p-3 flex items-center cursor-pointer ${paymentMethod === 'card' ? 'border-l-4 border-l-flipkart-blue' : ''}`}
-                        onClick={() => handlePaymentMethodSelect('card')}
-                      >
-                        <input 
-                          type="radio" 
-                          name="payment" 
-                          checked={paymentMethod === 'card'}
-                          onChange={() => handlePaymentMethodSelect('card')}
-                          className="mr-3"
+                <form onSubmit={handlePaymentSubmit} className="p-5">
+                  <div className="mb-5">
+                    <div className="mb-2">
+                      <label className="flex items-center mb-3">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="card"
+                          checked={paymentMethod === "card"}
+                          onChange={() => setPaymentMethod("card")}
+                          className="mr-2"
                         />
-                        <CreditCard className="h-5 w-5 mr-2 text-gray-600" />
-                        <span>Credit / Debit Card</span>
-                      </div>
+                        <CreditCard className="h-5 w-5 mr-2" />
+                        Credit/Debit Card
+                      </label>
                       
-                      {paymentMethod === 'card' && (
-                        <div className="p-4 border-t">
-                          <div className="space-y-3">
-                            <div>
-                              <label className="block text-sm text-gray-600 mb-1">Card Number</label>
-                              <input 
-                                type="text" 
-                                name="number"
-                                value={cardDetails.number}
-                                onChange={handleCardDetailsChange}
-                                placeholder="1234 5678 9012 3456"
-                                className="w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-flipkart-blue"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm text-gray-600 mb-1">Name on Card</label>
-                              <input 
-                                type="text" 
-                                name="name"
-                                value={cardDetails.name}
-                                onChange={handleCardDetailsChange}
-                                placeholder="John Doe"
-                                className="w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-flipkart-blue"
-                              />
-                            </div>
-                            <div className="flex space-x-4">
-                              <div className="flex-1">
-                                <label className="block text-sm text-gray-600 mb-1">Valid Until</label>
-                                <input 
-                                  type="text" 
-                                  name="expiry"
-                                  value={cardDetails.expiry}
-                                  onChange={handleCardDetailsChange}
-                                  placeholder="MM/YY"
-                                  className="w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-flipkart-blue"
-                                />
-                              </div>
-                              <div className="w-24">
-                                <label className="block text-sm text-gray-600 mb-1">CVV</label>
-                                <input 
-                                  type="password" 
-                                  name="cvv"
-                                  value={cardDetails.cvv}
-                                  onChange={handleCardDetailsChange}
-                                  placeholder="***"
-                                  maxLength={3}
-                                  className="w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-flipkart-blue"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* UPI */}
-                    <div className="border rounded">
-                      <div 
-                        className={`p-3 flex items-center cursor-pointer ${paymentMethod === 'upi' ? 'border-l-4 border-l-flipkart-blue' : ''}`}
-                        onClick={() => handlePaymentMethodSelect('upi')}
-                      >
-                        <input 
-                          type="radio" 
-                          name="payment" 
-                          checked={paymentMethod === 'upi'}
-                          onChange={() => handlePaymentMethodSelect('upi')}
-                          className="mr-3"
-                        />
-                        <span className="w-5 h-5 text-center mr-2 text-gray-600 font-bold">₹</span>
-                        <span>UPI</span>
-                      </div>
-                      
-                      {paymentMethod === 'upi' && (
-                        <div className="p-4 border-t">
+                      {paymentMethod === "card" && (
+                        <div className="pl-6 space-y-4">
                           <div>
-                            <label className="block text-sm text-gray-600 mb-1">UPI ID</label>
-                            <input 
-                              type="text" 
-                              value={upiId}
-                              onChange={(e) => setUpiId(e.target.value)}
-                              placeholder="username@upi"
-                              className="w-full p-2 border rounded focus:outline-none focus:ring-1 focus:ring-flipkart-blue"
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                            <input
+                              type="text"
+                              name="cardNumber"
+                              value={paymentInfo.cardNumber}
+                              onChange={handlePaymentInfoChange}
+                              placeholder="1234 5678 9012 3456"
+                              className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
                           </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            You'll receive a payment request on your UPI app.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Cash on Delivery */}
-                    <div className="border rounded">
-                      <div 
-                        className={`p-3 flex items-center cursor-pointer ${paymentMethod === 'cod' ? 'border-l-4 border-l-flipkart-blue' : ''}`}
-                        onClick={() => handlePaymentMethodSelect('cod')}
-                      >
-                        <input 
-                          type="radio" 
-                          name="payment" 
-                          checked={paymentMethod === 'cod'}
-                          onChange={() => handlePaymentMethodSelect('cod')}
-                          className="mr-3"
-                        />
-                        <Truck className="h-5 w-5 mr-2 text-gray-600" />
-                        <span>Cash on Delivery</span>
-                      </div>
-                      
-                      {paymentMethod === 'cod' && (
-                        <div className="p-4 border-t">
-                          <div className="flex items-start">
-                            <AlertCircle className="h-5 w-5 text-yellow-600 mr-2 flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-gray-700">
-                              Pay using cash when your order is delivered. Due to COVID safety, we recommend paying 
-                              using a contactless method.
-                            </p>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
+                            <input
+                              type="text"
+                              name="nameOnCard"
+                              value={paymentInfo.nameOnCard}
+                              onChange={handlePaymentInfoChange}
+                              className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Valid Until (MM/YY)</label>
+                              <input
+                                type="text"
+                                name="expiry"
+                                value={paymentInfo.expiry}
+                                onChange={handlePaymentInfoChange}
+                                placeholder="MM/YY"
+                                className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                              <input
+                                type="password"
+                                name="cvv"
+                                value={paymentInfo.cvv}
+                                onChange={handlePaymentInfoChange}
+                                maxLength={3}
+                                className="w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              />
+                            </div>
                           </div>
                         </div>
                       )}
                     </div>
+                    
+                    <label className="flex items-center mb-3">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="upi"
+                        checked={paymentMethod === "upi"}
+                        onChange={() => setPaymentMethod("upi")}
+                        className="mr-2"
+                      />
+                      UPI
+                    </label>
+                    
+                    <label className="flex items-center mb-3">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="netbanking"
+                        checked={paymentMethod === "netbanking"}
+                        onChange={() => setPaymentMethod("netbanking")}
+                        className="mr-2"
+                      />
+                      Net Banking
+                    </label>
+                    
+                    <label className="flex items-center mb-3">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cash"
+                        checked={paymentMethod === "cash"}
+                        onChange={() => setPaymentMethod("cash")}
+                        className="mr-2"
+                      />
+                      Cash on Delivery
+                    </label>
                   </div>
-
-                  <div className="mt-6 flex justify-between">
-                    <Button
+                  
+                  <div className="flex justify-between">
+                    <Button 
+                      type="button"
                       variant="outline"
                       onClick={() => setStep(1)}
                     >
                       BACK
                     </Button>
-                    <Button
-                      variant="flipkart"
-                      disabled={!isStepComplete(2)}
-                      onClick={() => setStep(3)}
+                    <Button 
+                      type="submit"
+                      className="bg-flipkart-blue hover:bg-flipkart-blue/90"
+                      disabled={isProcessing}
                     >
-                      CONTINUE
+                      {isProcessing ? "Processing..." : "PLACE ORDER"}
                     </Button>
                   </div>
-                </div>
-              )}
-
-              {/* Step 3: Order Summary and Confirmation */}
-              {step === 3 && (
-                <div className="bg-white rounded shadow p-4 mb-6">
-                  <h2 className="text-lg font-medium mb-4">Order Summary</h2>
-                  
-                  <div className="border-b pb-4 mb-4">
-                    {/* Delivery Details */}
-                    <div className="flex items-start mb-4">
-                      <MapPin className="h-5 w-5 text-gray-600 mt-0.5 mr-3" />
-                      <div>
-                        <h3 className="font-medium mb-1">Delivery Address</h3>
-                        {addresses.map(address => {
-                          if (address.id === selectedAddressId) {
-                            return (
-                              <div key={address.id}>
-                                <p className="text-sm">{address.name}, {address.phone}</p>
-                                <p className="text-sm text-gray-700">
-                                  {address.address}, {address.city}, {address.state} - {address.pincode}
-                                </p>
-                              </div>
-                            );
-                          }
-                          return null;
-                        })}
-                      </div>
-                    </div>
-                    
-                    {/* Payment Details */}
-                    <div className="flex items-start">
-                      <CreditCard className="h-5 w-5 text-gray-600 mt-0.5 mr-3" />
-                      <div>
-                        <h3 className="font-medium mb-1">Payment Method</h3>
-                        <p className="text-sm">
-                          {paymentMethod === 'card' && 'Credit/Debit Card'}
-                          {paymentMethod === 'upi' && 'UPI'}
-                          {paymentMethod === 'cod' && 'Cash on Delivery'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Item Details */}
-                  <div className="border-b pb-4 mb-4">
-                    <h3 className="font-medium mb-3">Items ({cartItems.length})</h3>
-                    
-                    <div className="space-y-3">
-                      {cartItems.map(item => (
-                        <div key={item.id} className="flex">
-                          <div className="w-16 h-16">
-                            <img 
-                              src={item.image} 
-                              alt={item.name} 
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                          <div className="ml-3 flex-1">
-                            <p className="text-sm font-medium">{item.name}</p>
-                            <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                            <p className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Delivery Estimate */}
-                  <div className="flex items-center mb-6">
-                    <Calendar className="h-5 w-5 text-gray-600 mr-2" />
-                    <div>
-                      <p className="text-sm font-medium">Estimated Delivery</p>
-                      <p className="text-sm text-gray-700">
-                        {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
-                          weekday: 'long', 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex justify-between">
-                    <Button
-                      variant="outline"
-                      onClick={() => setStep(2)}
-                    >
-                      BACK
-                    </Button>
-                    <Button
-                      variant="flipkart"
-                      onClick={handlePlaceOrder}
-                    >
-                      PLACE ORDER
-                    </Button>
-                  </div>
-                </div>
+                </form>
               )}
             </div>
-
-            {/* Price Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded shadow p-4 sticky top-20">
-                <h2 className="text-gray-500 font-medium uppercase text-sm mb-4">PRICE DETAILS</h2>
-                <div className="space-y-3 pb-3 border-b border-dashed">
-                  <div className="flex justify-between">
-                    <span>Price ({cartItems.length} items)</span>
-                    <span>{formatPrice(subtotal)}</span>
+          </div>
+          
+          {/* Order summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm p-4 sticky top-20">
+              <h2 className="font-medium border-b pb-2 mb-3">Order Summary</h2>
+              
+              <div className="max-h-60 overflow-y-auto mb-3">
+                {cartItems.map((item) => (
+                  <div key={item.id} className="flex py-2 border-b">
+                    <div className="w-12 h-12 flex-shrink-0">
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div className="ml-3 flex-grow">
+                      <div className="text-sm line-clamp-1">{item.name}</div>
+                      <div className="text-sm text-gray-500">Qty: {item.quantity}</div>
+                    </div>
+                    <div className="ml-2 font-medium">
+                      {formatPrice(item.price * item.quantity)}
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Discount</span>
-                    <span className="text-flipkart-green">- {formatPrice(discount)}</span>
+                ))}
+              </div>
+              
+              <div className="space-y-2 text-sm border-b pb-3 mb-3">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Discount</span>
+                  <span className="text-flipkart-green">- {formatPrice(discount)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shipping</span>
+                  <span className="text-flipkart-green">FREE</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between font-bold">
+                <span>Total</span>
+                <span>{formatPrice(total)}</span>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t">
+                <div className="text-xs text-gray-500 mb-2">Delivery Address:</div>
+                {step > 1 && (
+                  <div className="text-sm">
+                    <div className="font-medium">{address.fullName}</div>
+                    <div>{address.address}</div>
+                    <div>{address.locality ? `${address.locality}, ` : ''}{address.city}, {address.state} - {address.pincode}</div>
+                    <div>Phone: {address.phone}</div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Delivery Charges</span>
-                    <span className="text-flipkart-green">FREE</span>
-                  </div>
-                </div>
-                <div className="flex justify-between font-medium py-3 border-b border-dashed">
-                  <span>Total Amount</span>
-                  <span>{formatPrice(total)}</span>
-                </div>
-                <div className="text-flipkart-green font-medium py-3">
-                  You will save {formatPrice(discount)} on this order
-                </div>
+                )}
               </div>
             </div>
           </div>
-        )}
+        </div>
       </main>
       <Footer />
     </div>

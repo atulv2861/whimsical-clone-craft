@@ -16,9 +16,11 @@ import ProductDetail from "./pages/ECommerce/ProductDetail";
 import Login from "./pages/ECommerce/Login";
 import SignUp from "./pages/ECommerce/SignUp";
 import Cart from "./pages/ECommerce/Cart";
+import Checkout from "./pages/ECommerce/Checkout";
 import MyOrders from "./pages/ECommerce/MyOrders";
 import Wishlist from "./pages/ECommerce/Wishlist";
 import Profile from "./pages/ECommerce/Profile";
+import Settings from "./pages/ECommerce/Settings";
 import CategoryPage from "./pages/ECommerce/CategoryPage";
 import AboutPage from "./pages/ECommerce/AboutPage";
 import ContactPage from "./pages/ECommerce/ContactPage";
@@ -44,9 +46,11 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/category/:categoryName" element={<CategoryPage />} />
             <Route path="/search" element={<SearchPage />} />
             

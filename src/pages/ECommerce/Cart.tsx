@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/ecommerce/Navbar";
-import { Button } from "@/components/Button";
+import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, ShieldCheck, TruckIcon } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import Footer from "@/components/ecommerce/Footer";
@@ -55,7 +55,7 @@ const Cart = () => {
                   <h3 className="text-xl mb-2">Your cart is empty!</h3>
                   <p className="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
                   <Link to="/">
-                    <Button variant="flipkart">Shop Now</Button>
+                    <Button variant="default" className="bg-flipkart-blue hover:bg-flipkart-blue/90">Shop Now</Button>
                   </Link>
                 </div>
               ) : (
@@ -119,9 +119,8 @@ const Cart = () => {
                   ))}
                   <div className="flex justify-end">
                     <Button 
-                      variant="flipkart" 
-                      className="mt-2"
                       onClick={handleCheckout}
+                      className="mt-2 bg-flipkart-blue hover:bg-flipkart-blue/90 flex items-center"
                     >
                       PLACE ORDER
                     </Button>

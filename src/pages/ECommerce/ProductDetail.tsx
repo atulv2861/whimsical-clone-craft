@@ -52,6 +52,9 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [pincode, setPincode] = useState("");
+  const [deliveryInfo, setDeliveryInfo] = useState<string | null>(null);
   const { toast } = useToast();
   const { addToCart } = useCart();
 
@@ -87,11 +90,79 @@ const ProductDetail = () => {
   };
 
   const handleAddToWishlist = () => {
+    setIsFavorite(!isFavorite);
     toast({
-      title: "Added to wishlist",
-      description: `${product.name} has been added to your wishlist.`,
+      title: isFavorite ? "Removed from wishlist" : "Added to wishlist",
+      description: `${product.name} has been ${isFavorite ? "removed from" : "added to"} your wishlist.`,
       duration: 3000,
     });
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: `Check out this amazing product: ${product.name}`,
+        url: window.location.href,
+      })
+      .then(() => {
+        toast({
+          title: "Shared successfully",
+          description: "Product has been shared.",
+          duration: 3000,
+        });
+      })
+      .catch((error) => {
+        console.error('Error sharing:', error);
+        // Fallback for when sharing fails
+        handleCopyLink();
+      });
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      handleCopyLink();
+    }
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast({
+      title: "Link copied",
+      description: "Product link has been copied to clipboard.",
+      duration: 3000,
+    });
+  };
+
+  const handleWriteReview = () => {
+    toast({
+      title: "Write a review",
+      description: "Review form will be shown here.",
+      duration: 3000,
+    });
+    // In a real app, this would typically open a modal or navigate to a review form
+  };
+
+  const checkDelivery = () => {
+    if (!pincode || pincode.length !== 6 || !/^\d+$/.test(pincode)) {
+      toast({
+        title: "Invalid pincode",
+        description: "Please enter a valid 6-digit pincode.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Simulate API call to check delivery
+    setDeliveryInfo("Loading...");
+    setTimeout(() => {
+      // For demo purposes, randomly choose between available and not available
+      const isAvailable = Math.random() > 0.3;
+      if (isAvailable) {
+        setDeliveryInfo("Delivery available. Expected delivery in 2-3 days.");
+      } else {
+        setDeliveryInfo("Sorry, delivery not available in this area.");
+      }
+    }, 1000);
   };
 
   const increaseQuantity = () => {
@@ -139,7 +210,7 @@ const ProductDetail = () => {
                   onClick={handleAddToWishlist}
                   className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white border shadow-sm flex items-center justify-center"
                 >
-                  <Heart className="h-5 w-5 text-gray-500 hover:text-red-500" />
+                  <Heart className={`h-5 w-5 ${isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-500'}`} />
                 </button>
               </div>
             </div>
@@ -174,10 +245,23 @@ const ProductDetail = () => {
                         type="text" 
                         placeholder="Enter pincode"
                         className="p-1.5 text-sm border rounded w-32 focus:outline-none focus:ring-1 focus:ring-flipkart-blue"
+                        value={pincode}
+                        onChange={(e) => setPincode(e.target.value)}
+                        maxLength={6}
                       />
-                      <button className="text-flipkart-blue text-sm font-medium ml-2">Check</button>
+                      <button 
+                        className="text-flipkart-blue text-sm font-medium ml-2"
+                        onClick={checkDelivery}
+                      >
+                        Check
+                      </button>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">Usually delivered in 2 days</p>
+                    {deliveryInfo && (
+                      <p className="text-sm mt-1 text-gray-700">{deliveryInfo}</p>
+                    )}
+                    {!deliveryInfo && (
+                      <p className="text-sm text-gray-500 mt-1">Usually delivered in 2 days</p>
+                    )}
                   </div>
                 </div>
                 <div className="border-t border-gray-200 pt-3 flex space-x-6">
@@ -231,7 +315,7 @@ const ProductDetail = () => {
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black flex items-center justify-center"
+                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black inline-flex items-center justify-center"
                   onClick={handleAddToCart}
                 >
                   <ShoppingCart className="h-5 w-5 mr-2" /> ADD TO CART
@@ -239,7 +323,7 @@ const ProductDetail = () => {
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  className="flex-1 bg-flipkart-blue hover:bg-blue-600 flex items-center justify-center"
+                  className="flex-1 bg-flipkart-blue hover:bg-blue-600 inline-flex items-center justify-center"
                   onClick={handleBuyNow}
                 >
                   BUY NOW
@@ -247,7 +331,10 @@ const ProductDetail = () => {
               </div>
 
               {/* Share Button */}
-              <button className="flex items-center text-gray-600">
+              <button 
+                className="flex items-center text-gray-600 hover:text-flipkart-blue"
+                onClick={handleShare}
+              >
                 <Share2 className="h-4 w-4 mr-1" /> Share
               </button>
             </div>
@@ -304,7 +391,13 @@ const ProductDetail = () => {
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <Button variant="outline" size="sm">Write a Review</Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleWriteReview}
+                  >
+                    Write a Review
+                  </Button>
                 </div>
                 <div className="text-center py-8 text-gray-500">
                   <p>Reviews will appear here after customers start posting them.</p>

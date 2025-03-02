@@ -1,10 +1,10 @@
-
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
 
 export const Navbar = () => {
   const [isSearchFocused, setIsSearchFocused] = React.useState(false);
@@ -15,6 +15,7 @@ export const Navbar = () => {
   const [searchSuggestions, setSearchSuggestions] = React.useState<string[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   
+  const { totalItems } = useCart();
   const moreDropdownRef = React.useRef<HTMLDivElement>(null);
   const moreButtonRef = React.useRef<HTMLButtonElement>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
@@ -32,7 +33,6 @@ export const Navbar = () => {
     { name: "Mobiles", path: "/category/mobiles" },
   ];
 
-  // Mock search suggestions based on query
   const mockSuggestions = {
     "": [],
     "ip": ["iPhone 13", "iPhone 14", "iPhone 15", "iPad Pro", "iPad Mini"],
@@ -41,14 +41,11 @@ export const Navbar = () => {
     "head": ["Headphones", "Headphone Case", "Headphone Stand", "Wireless Headphones"],
   };
 
-  // Debounce search input
   React.useEffect(() => {
     const handler = setTimeout(() => {
       if (searchQuery) {
         setIsLoading(true);
-        // Simulate API call
         setTimeout(() => {
-          // Find matching suggestions
           const suggestions = Object.entries(mockSuggestions).find(([key]) => 
             searchQuery.toLowerCase().startsWith(key) && key !== ""
           );
@@ -59,14 +56,13 @@ export const Navbar = () => {
       } else {
         setSearchSuggestions([]);
       }
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => {
       clearTimeout(handler);
     };
   }, [searchQuery]);
 
-  // Close suggestions on click outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -100,7 +96,7 @@ export const Navbar = () => {
   const handleMoreMouseLeave = () => {
     dropdownTimeout = setTimeout(() => {
       setIsMoreDropdownOpen(false);
-    }, 300); // Delay before hiding
+    }, 300);
   };
 
   const handleDropdownMouseEnter = () => {
@@ -113,13 +109,12 @@ export const Navbar = () => {
   const handleDropdownMouseLeave = () => {
     dropdownTimeout = setTimeout(() => {
       setIsMoreDropdownOpen(false);
-    }, 300); // Delay before hiding
+    }, 300);
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // We would typically handle search here
       toast({
         title: "Search",
         description: `Searching for: ${searchQuery}`,
@@ -158,7 +153,6 @@ export const Navbar = () => {
   };
 
   const handleMoreItemClick = (path: string) => {
-    // Close dropdown and navigate
     setIsMoreDropdownOpen(false);
     navigate(path);
   };
@@ -167,7 +161,6 @@ export const Navbar = () => {
     <header className="bg-flipkart-blue sticky top-0 z-50 shadow-md">
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-16 px-4 md:px-6">
-          {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <div className="text-white font-bold italic text-2xl tracking-tight">
@@ -180,7 +173,6 @@ export const Navbar = () => {
             </Link>
           </div>
 
-          {/* Search bar - hidden on mobile, visible on desktop */}
           <div className="hidden md:flex flex-1 mx-4 relative">
             <form
               onSubmit={handleSearchSubmit}
@@ -214,7 +206,6 @@ export const Navbar = () => {
               </div>
             </form>
             
-            {/* Search Suggestions */}
             {showSearchSuggestions && searchSuggestions.length > 0 && (
               <div 
                 ref={searchSuggestionsRef}
@@ -240,7 +231,6 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
             <Button
               variant="text"
@@ -253,10 +243,15 @@ export const Navbar = () => {
             </Button>
             <Link
               to="/cart"
-              className="flex items-center text-white hover:text-gray-200"
+              className="flex items-center text-white hover:text-gray-200 relative"
             >
               <ShoppingCart className="h-5 w-5 mr-1" />
               <span>Cart</span>
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                  {totalItems}
+                </span>
+              )}
             </Link>
             <div className="relative" 
                 onMouseEnter={handleMoreMouseEnter}
@@ -294,18 +289,28 @@ export const Navbar = () => {
                   >
                     Profile
                   </button>
+                  <button
+                    onClick={() => handleMoreItemClick("/settings")}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Settings
+                  </button>
                 </div>
               )}
             </div>
           </nav>
 
-          {/* Mobile Navigation */}
           <div className="flex md:hidden items-center space-x-3">
             <Link
               to="/cart"
-              className="text-white hover:text-gray-200"
+              className="text-white hover:text-gray-200 relative"
             >
               <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                  {totalItems}
+                </span>
+              )}
             </Link>
             <button
               onClick={toggleMenu}
@@ -320,7 +325,6 @@ export const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white">
             <div className="p-4">
@@ -355,7 +359,6 @@ export const Navbar = () => {
                 </div>
               </form>
               
-              {/* Mobile Search Suggestions */}
               {showSearchSuggestions && searchSuggestions.length > 0 && (
                 <div className="bg-white rounded-md shadow-lg mb-4 max-h-60 overflow-y-auto">
                   {isLoading ? (
@@ -419,6 +422,13 @@ export const Navbar = () => {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     My Profile
+                  </Link>
+                  <Link
+                    to="/settings"
+                    className="block p-2 text-gray-600 hover:bg-gray-100 rounded"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Settings
                   </Link>
                 </div>
               </div>

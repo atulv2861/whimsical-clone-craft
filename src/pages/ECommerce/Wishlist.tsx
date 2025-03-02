@@ -1,38 +1,63 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Navbar } from "@/components/ecommerce/Navbar";
 import { Button } from "@/components/Button";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/contexts/CartContext";
+import Footer from "@/components/ecommerce/Footer";
 
 const Wishlist = () => {
   // This would typically fetch wishlist items from an API
-  const wishlistItems = [
+  const [wishlistItems, setWishlistItems] = useState([
     {
       id: 1,
       name: "Smartphone X Pro",
-      price: "$129.99",
-      originalPrice: "$149.99",
-      image: "https://placehold.co/300x300/e2e8f0/1e293b?text=Smartphone",
+      price: 129.99,
+      originalPrice: 149.99,
+      image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       inStock: true,
     },
     {
       id: 2,
       name: "Wireless Earbuds",
-      price: "$49.99",
-      originalPrice: "$69.99",
-      image: "https://placehold.co/300x300/e2e8f0/1e293b?text=Earbuds",
+      price: 49.99,
+      originalPrice: 69.99,
+      image: "https://images.unsplash.com/photo-1606220838315-056192d5e927?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       inStock: true,
     },
     {
       id: 3,
       name: "Smart Watch Series 5",
-      price: "$89.99",
-      originalPrice: "$99.99",
-      image: "https://placehold.co/300x300/e2e8f0/1e293b?text=Watch",
+      price: 89.99,
+      originalPrice: 99.99,
+      image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       inStock: false,
     },
-  ];
+  ]);
+
+  const { toast } = useToast();
+  const { addToCart } = useCart();
+
+  const handleRemoveFromWishlist = (id: number) => {
+    setWishlistItems(wishlistItems.filter(item => item.id !== id));
+    toast({
+      title: "Removed from wishlist",
+      description: "Item has been removed from your wishlist",
+      duration: 3000,
+    });
+  };
+
+  const handleAddToCart = (item: any) => {
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      originalPrice: item.originalPrice,
+      image: item.image
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -53,6 +78,7 @@ const Wishlist = () => {
                   <button 
                     className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow hover:bg-red-50 transition-colors"
                     aria-label="Remove from wishlist"
+                    onClick={() => handleRemoveFromWishlist(item.id)}
                   >
                     <Trash2 className="h-4 w-4 text-red-500" />
                   </button>
@@ -62,17 +88,15 @@ const Wishlist = () => {
                     {item.name}
                   </Link>
                   <div className="flex items-center mt-1">
-                    <span className="font-bold text-gray-800">{item.price}</span>
+                    <span className="font-bold text-gray-800">${item.price}</span>
                     {item.originalPrice && (
                       <>
                         <span className="text-gray-400 line-through text-sm ml-2">
-                          {item.originalPrice}
+                          ${item.originalPrice}
                         </span>
                         <span className="text-green-600 text-sm ml-2">
                           {Math.round(
-                            ((parseFloat(item.originalPrice.replace("$", "")) - 
-                              parseFloat(item.price.replace("$", ""))) / 
-                              parseFloat(item.originalPrice.replace("$", ""))) * 100
+                            ((item.originalPrice - item.price) / item.originalPrice) * 100
                           )}% off
                         </span>
                       </>
@@ -83,6 +107,7 @@ const Wishlist = () => {
                       <Button 
                         variant="flipkart" 
                         className="w-full flex items-center justify-center gap-2"
+                        onClick={() => handleAddToCart(item)}
                       >
                         <ShoppingCart className="h-4 w-4" />
                         <span>Add to Cart</span>
@@ -115,6 +140,7 @@ const Wishlist = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

@@ -19,6 +19,10 @@ import MyOrders from "./pages/ECommerce/MyOrders";
 import Wishlist from "./pages/ECommerce/Wishlist";
 import Profile from "./pages/ECommerce/Profile";
 import CategoryPage from "./pages/ECommerce/CategoryPage";
+import AboutPage from "./pages/ECommerce/AboutPage";
+import ContactPage from "./pages/ECommerce/ContactPage";
+import SearchPage from "./pages/ECommerce/SearchPage";
+import BasicPage from "./pages/ECommerce/BasicPage";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +46,26 @@ const App = () => (
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/category/:categoryName" element={<CategoryPage />} />
+          <Route path="/search" element={<SearchPage />} />
+          
+          {/* New Pages */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          
+          {/* Basic Page routes for footer links */}
+          <Route path="/payments" element={<BasicPage />} />
+          <Route path="/shipping" element={<BasicPage />} />
+          <Route path="/returns" element={<BasicPage />} />
+          <Route path="/faq" element={<BasicPage />} />
+          <Route path="/return-policy" element={<BasicPage />} />
+          <Route path="/terms" element={<BasicPage />} />
+          <Route path="/security" element={<BasicPage />} />
+          <Route path="/privacy" element={<BasicPage />} />
+          <Route path="/careers" element={<BasicPage />} />
+          <Route path="/press" element={<BasicPage />} />
+          <Route path="/corporate" element={<BasicPage />} />
+          <Route path="/report" element={<BasicPage />} />
+          <Route path="/site-map" element={<BasicPage />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

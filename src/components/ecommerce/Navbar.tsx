@@ -4,16 +4,23 @@ import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, User, ChevronDown, Menu, X } from "lucide-react";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 export const Navbar = () => {
   const [isSearchFocused, setIsSearchFocused] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isMoreDropdownOpen, setIsMoreDropdownOpen] = React.useState(false);
+  const [showSearchSuggestions, setShowSearchSuggestions] = React.useState(false);
+  const [searchSuggestions, setSearchSuggestions] = React.useState<string[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  
   const moreDropdownRef = React.useRef<HTMLDivElement>(null);
   const moreButtonRef = React.useRef<HTMLButtonElement>(null);
   const searchRef = React.useRef<HTMLInputElement>(null);
+  const searchSuggestionsRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const categories = [
     { name: "Electronics", path: "/category/electronics" },
@@ -24,6 +31,59 @@ export const Navbar = () => {
     { name: "Toys & Baby", path: "/category/toys" },
     { name: "Mobiles", path: "/category/mobiles" },
   ];
+
+  // Mock search suggestions based on query
+  const mockSuggestions = {
+    "": [],
+    "ip": ["iPhone 13", "iPhone 14", "iPhone 15", "iPad Pro", "iPad Mini"],
+    "sam": ["Samsung Galaxy S23", "Samsung TV", "Samsung Refrigerator", "Samsung Washing Machine"],
+    "lap": ["Laptop", "Laptop Bag", "Laptop Stand", "Laptop Cooler", "Laptop Charger"],
+    "head": ["Headphones", "Headphone Case", "Headphone Stand", "Wireless Headphones"],
+  };
+
+  // Debounce search input
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      if (searchQuery) {
+        setIsLoading(true);
+        // Simulate API call
+        setTimeout(() => {
+          // Find matching suggestions
+          const suggestions = Object.entries(mockSuggestions).find(([key]) => 
+            searchQuery.toLowerCase().startsWith(key) && key !== ""
+          );
+          
+          setSearchSuggestions(suggestions ? suggestions[1] : []);
+          setIsLoading(false);
+        }, 300);
+      } else {
+        setSearchSuggestions([]);
+      }
+    }, 300); // 300ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  // Close suggestions on click outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchSuggestionsRef.current &&
+        !searchSuggestionsRef.current.contains(event.target as Node) &&
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowSearchSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -58,8 +118,43 @@ export const Navbar = () => {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // We would typically handle search here
-    console.log("Searching for:", searchQuery);
+    if (searchQuery.trim()) {
+      // We would typically handle search here
+      toast({
+        title: "Search",
+        description: `Searching for: ${searchQuery}`,
+      });
+      console.log("Searching for:", searchQuery);
+      setShowSearchSuggestions(false);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  const handleSearchInputFocus = () => {
+    setIsSearchFocused(true);
+    if (searchQuery.trim() && searchSuggestions.length > 0) {
+      setShowSearchSuggestions(true);
+    }
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (value.trim()) {
+      setShowSearchSuggestions(true);
+    } else {
+      setShowSearchSuggestions(false);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery(suggestion);
+    setShowSearchSuggestions(false);
+    toast({
+      title: "Search",
+      description: `Searching for: ${suggestion}`,
+    });
+    navigate(`/search?q=${encodeURIComponent(suggestion)}`);
   };
 
   const handleMoreItemClick = (path: string) => {
@@ -93,28 +188,56 @@ export const Navbar = () => {
             >
               <div
                 className={cn(
-                  "flex items-center flex-1 bg-white rounded-sm overflow-hidden",
+                  "flex items-center flex-1 bg-white rounded-sm overflow-hidden relative",
                   isSearchFocused ? "ring-2 ring-blue-400" : ""
                 )}
               >
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <Search className="h-5 w-5" />
+                </div>
                 <input
                   type="text"
                   ref={searchRef}
                   placeholder="Search for products, brands and more"
-                  className="py-2 px-4 w-full outline-none text-sm"
+                  className="py-2 pl-10 pr-4 w-full outline-none text-sm"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
+                  onChange={handleSearchInputChange}
+                  onFocus={handleSearchInputFocus}
                   onBlur={() => setIsSearchFocused(false)}
                 />
                 <button
                   type="submit"
-                  className="bg-flipkart-blue text-white p-2"
+                  className="bg-flipkart-yellow text-black px-4 py-2 font-medium"
                 >
-                  <Search className="h-5 w-5" />
+                  Search
                 </button>
               </div>
             </form>
+            
+            {/* Search Suggestions */}
+            {showSearchSuggestions && searchSuggestions.length > 0 && (
+              <div 
+                ref={searchSuggestionsRef}
+                className="absolute top-full left-0 w-full bg-white rounded-b-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto"
+              >
+                {isLoading ? (
+                  <div className="p-3 text-center text-gray-500">Loading suggestions...</div>
+                ) : (
+                  <ul>
+                    {searchSuggestions.map((suggestion, index) => (
+                      <li 
+                        key={index}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <Search className="h-4 w-4 text-gray-400 mr-2" />
+                        <span>{suggestion}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Desktop Navigation */}
@@ -207,17 +330,20 @@ export const Navbar = () => {
               >
                 <div
                   className={cn(
-                    "flex items-center flex-1 bg-white border rounded-sm overflow-hidden",
+                    "flex items-center flex-1 bg-white border rounded-sm overflow-hidden relative",
                     isSearchFocused ? "ring-2 ring-blue-400" : ""
                   )}
                 >
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <Search className="h-5 w-5" />
+                  </div>
                   <input
                     type="text"
                     placeholder="Search for products, brands and more"
-                    className="py-2 px-4 w-full outline-none text-sm"
+                    className="py-2 pl-10 pr-4 w-full outline-none text-sm"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setIsSearchFocused(true)}
+                    onChange={handleSearchInputChange}
+                    onFocus={handleSearchInputFocus}
                     onBlur={() => setIsSearchFocused(false)}
                   />
                   <button
@@ -228,6 +354,29 @@ export const Navbar = () => {
                   </button>
                 </div>
               </form>
+              
+              {/* Mobile Search Suggestions */}
+              {showSearchSuggestions && searchSuggestions.length > 0 && (
+                <div className="bg-white rounded-md shadow-lg mb-4 max-h-60 overflow-y-auto">
+                  {isLoading ? (
+                    <div className="p-3 text-center text-gray-500">Loading suggestions...</div>
+                  ) : (
+                    <ul>
+                      {searchSuggestions.map((suggestion, index) => (
+                        <li 
+                          key={index}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center border-b border-gray-100 last:border-b-0"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                          <Search className="h-4 w-4 text-gray-400 mr-2" />
+                          <span>{suggestion}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+              
               <div className="space-y-1">
                 <Link
                   to="/login"
@@ -276,8 +425,6 @@ export const Navbar = () => {
             </div>
           </div>
         )}
-
-        {/* Categories row removed - now using the separate CategoriesTab component */}
       </div>
     </header>
   );

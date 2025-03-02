@@ -1,7 +1,7 @@
-
 import React, { useEffect } from "react";
 import { Navbar } from "@/components/ecommerce/Navbar";
 import { CategoriesTab } from "@/components/ecommerce/CategoriesTab";
+import Footer from "@/components/ecommerce/Footer";
 import { Carousel } from "@/components/ui/carousel";
 import { CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -91,7 +91,6 @@ const Home = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Set up reveal animation for elements with reveal-item class
     const revealItems = document.querySelectorAll(".reveal-item");
     
     const revealOnScroll = () => {
@@ -105,13 +104,10 @@ const Home = () => {
       });
     };
 
-    // Run once on load
     revealOnScroll();
     
-    // Add scroll event listener
     window.addEventListener("scroll", revealOnScroll);
     
-    // Clean up
     return () => {
       window.removeEventListener("scroll", revealOnScroll);
     };
@@ -130,7 +126,6 @@ const Home = () => {
       <Navbar />
       <CategoriesTab />
       <main className="flex-grow">
-        {/* Hero Banner Carousel */}
         <section className="mb-4">
           <Carousel className="w-full">
             <CarouselContent>
@@ -155,7 +150,6 @@ const Home = () => {
           </Carousel>
         </section>
 
-        {/* Categories */}
         <section className="mb-8 container mx-auto px-4">
           <h2 className="section-title">Shop By Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -178,7 +172,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Deal of the Day */}
         <section className="mb-8 bg-white py-5">
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-4">
@@ -221,7 +214,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Trending Products */}
         <section className="mb-8 bg-white py-5">
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-4">
@@ -279,7 +271,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Offers Banner */}
         <section className="mb-8 container mx-auto px-4">
           <div className="deal-banner rounded-md p-6 reveal-item">
             <h2 className="text-xl md:text-2xl font-bold mb-2">BIGGEST DEALS ON TOP BRANDS</h2>
@@ -291,54 +282,7 @@ const Home = () => {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-flipkart-black text-white py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-gray-400 font-medium mb-4 uppercase text-xs">ABOUT</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/about" className="hover:underline">About Us</Link></li>
-                <li><Link to="/careers" className="hover:underline">Careers</Link></li>
-                <li><Link to="/stories" className="hover:underline">Flipkart Stories</Link></li>
-                <li><Link to="/wholesale" className="hover:underline">Flipkart Wholesale</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-gray-400 font-medium mb-4 uppercase text-xs">HELP</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/payments" className="hover:underline">Payments</Link></li>
-                <li><Link to="/shipping" className="hover:underline">Shipping</Link></li>
-                <li><Link to="/returns" className="hover:underline">Returns & Refunds</Link></li>
-                <li><Link to="/faq" className="hover:underline">FAQ</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-gray-400 font-medium mb-4 uppercase text-xs">POLICY</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link to="/return-policy" className="hover:underline">Return Policy</Link></li>
-                <li><Link to="/terms" className="hover:underline">Terms Of Use</Link></li>
-                <li><Link to="/security" className="hover:underline">Security</Link></li>
-                <li><Link to="/privacy" className="hover:underline">Privacy</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-gray-400 font-medium mb-4 uppercase text-xs">SOCIAL</h3>
-              <ul className="space-y-2 text-sm">
-                <li><a href="https://facebook.com" className="hover:underline">Facebook</a></li>
-                <li><a href="https://twitter.com" className="hover:underline">Twitter</a></li>
-                <li><a href="https://youtube.com" className="hover:underline">YouTube</a></li>
-                <li><a href="https://instagram.com" className="hover:underline">Instagram</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-700 mt-8 pt-6">
-            <p className="text-sm text-gray-400 text-center">
-              &copy; {new Date().getFullYear()} Flipkart Clone. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

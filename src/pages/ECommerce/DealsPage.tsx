@@ -202,10 +202,10 @@ const DealsPage = () => {
                   <Button 
                     variant="primary" 
                     size="sm" 
-                    className="w-full bg-flipkart-yellow hover:bg-yellow-500 text-black flex items-center justify-center"
+                    className="w-full bg-flipkart-yellow hover:bg-yellow-500 text-black flex items-center justify-center gap-1"
                     onClick={() => handleAddToCart(product)}
                   >
-                    <ShoppingBag className="h-4 w-4 mr-2" /> ADD TO CART
+                    <ShoppingBag className="h-4 w-4" /> ADD TO CART
                   </Button>
                 </div>
               </div>

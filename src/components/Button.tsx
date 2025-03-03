@@ -29,7 +29,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         className={cn(
-          "relative inline-flex items-center justify-center rounded-md font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50",
+          "relative inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50",
           variants[variant],
           sizes[size],
           className
@@ -62,7 +62,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             </svg>
           </span>
         )}
-        <span className={cn(isLoading ? "invisible" : "")}>{children}</span>
+        <span className={cn(isLoading ? "invisible" : "", "flex items-center gap-2")}>{children}</span>
       </button>
     );
   }

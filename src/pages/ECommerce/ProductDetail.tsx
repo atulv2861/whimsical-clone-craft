@@ -318,7 +318,7 @@ const ProductDetail = () => {
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black inline-flex items-center justify-center gap-2"
+                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black"
                   onClick={handleAddToCart}
                 >
                   <ShoppingCart className="h-5 w-5" /> ADD TO CART
@@ -326,7 +326,7 @@ const ProductDetail = () => {
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  className="flex-1 bg-flipkart-blue hover:bg-blue-600 inline-flex items-center justify-center"
+                  className="flex-1 bg-flipkart-blue hover:bg-blue-600"
                   onClick={handleBuyNow}
                 >
                   BUY NOW

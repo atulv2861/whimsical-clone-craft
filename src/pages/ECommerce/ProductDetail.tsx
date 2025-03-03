@@ -1,15 +1,14 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Navbar } from "@/components/ecommerce/Navbar";
-import { Star, ShoppingCart, Heart, Share2, TruckIcon, Shield, RotateCcw, Check } from "lucide-react";
+import { Star, ShoppingCart, Heart, Share2, TruckIcon, Shield, RotateCcw, Check, Pen } from "lucide-react";
 import { Button } from "@/components/Button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import Footer from "@/components/ecommerce/Footer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
-// Mock data - in a real app this would come from an API
 const product = {
   id: 1,
   name: "Apple iPhone 13 (128GB) - Midnight",
@@ -55,6 +54,12 @@ const ProductDetail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [pincode, setPincode] = useState("");
   const [deliveryInfo, setDeliveryInfo] = useState<string | null>(null);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewData, setReviewData] = useState({
+    rating: 5,
+    title: "",
+    comment: "",
+  });
   const { toast } = useToast();
   const { addToCart } = useCart();
 
@@ -85,7 +90,6 @@ const ProductDetail = () => {
       image: product.images[0]
     });
     
-    // Navigate to cart page
     window.location.href = '/cart';
   };
 
@@ -114,11 +118,9 @@ const ProductDetail = () => {
       })
       .catch((error) => {
         console.error('Error sharing:', error);
-        // Fallback for when sharing fails
         handleCopyLink();
       });
     } else {
-      // Fallback for browsers that don't support Web Share API
       handleCopyLink();
     }
   };
@@ -133,12 +135,21 @@ const ProductDetail = () => {
   };
 
   const handleWriteReview = () => {
+    setReviewDialogOpen(true);
+  };
+
+  const submitReview = () => {
     toast({
-      title: "Write a review",
-      description: "Review form will be shown here.",
+      title: "Review submitted",
+      description: "Thank you for your feedback!",
       duration: 3000,
     });
-    // In a real app, this would typically open a modal or navigate to a review form
+    setReviewDialogOpen(false);
+    setReviewData({
+      rating: 5,
+      title: "",
+      comment: "",
+    });
   };
 
   const checkDelivery = () => {
@@ -152,10 +163,8 @@ const ProductDetail = () => {
       return;
     }
 
-    // Simulate API call to check delivery
     setDeliveryInfo("Loading...");
     setTimeout(() => {
-      // For demo purposes, randomly choose between available and not available
       const isAvailable = Math.random() > 0.3;
       if (isAvailable) {
         setDeliveryInfo("Delivery available. Expected delivery in 2-3 days.");
@@ -183,7 +192,6 @@ const ProductDetail = () => {
       <main className="flex-grow bg-white">
         <div className="container mx-auto px-4 py-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Product Images */}
             <div className="flex flex-col-reverse md:flex-row md:space-x-4">
               <div className="flex md:flex-col space-x-2 md:space-x-0 md:space-y-2 mt-2 md:mt-0">
                 {product.images.map((image, index) => (
@@ -215,7 +223,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Product Info */}
             <div>
               <h1 className="text-xl md:text-2xl font-medium mb-1">{product.name}</h1>
               <div className="flex items-center space-x-2 mb-2">
@@ -234,7 +241,6 @@ const ProductDetail = () => {
               </div>
               <p className="text-xs text-gray-500 mb-6">inclusive of all taxes</p>
 
-              {/* Delivery Options */}
               <div className="bg-gray-50 p-4 rounded mb-6">
                 <div className="flex items-start mb-4">
                   <TruckIcon className="h-5 w-5 text-gray-700 mt-0.5 mr-2" />
@@ -280,7 +286,6 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              {/* Seller Info */}
               <div className="mb-6">
                 <p className="text-sm">
                   <span className="text-gray-600">Seller: </span>
@@ -288,7 +293,6 @@ const ProductDetail = () => {
                 </p>
               </div>
 
-              {/* Quantity Selector */}
               <div className="flex items-center mb-6">
                 <span className="text-gray-600 mr-4">Quantity:</span>
                 <div className="flex items-center">
@@ -310,7 +314,6 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex space-x-4 mb-6">
                 <Button 
                   variant="primary" 
@@ -330,7 +333,6 @@ const ProductDetail = () => {
                 </Button>
               </div>
 
-              {/* Share Button */}
               <button 
                 className="flex items-center text-gray-600 hover:text-flipkart-blue"
                 onClick={handleShare}
@@ -340,7 +342,6 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Product Details Tabs */}
           <div className="mt-8">
             <Tabs defaultValue="description">
               <TabsList className="w-full justify-start border-b bg-transparent">
@@ -395,7 +396,9 @@ const ProductDetail = () => {
                     variant="outline" 
                     size="sm"
                     onClick={handleWriteReview}
+                    className="flex items-center"
                   >
+                    <Pen className="h-4 w-4 mr-2" />
                     Write a Review
                   </Button>
                 </div>
@@ -408,6 +411,66 @@ const ProductDetail = () => {
         </div>
       </main>
       <Footer />
+
+      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Write a Review</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col space-y-1.5">
+              <label htmlFor="rating" className="text-sm font-medium">Rating</label>
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button 
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewData({...reviewData, rating: star})}
+                    className="focus:outline-none"
+                  >
+                    <Star 
+                      className="h-6 w-6" 
+                      fill={star <= reviewData.rating ? "#FFB800" : "none"} 
+                      color={star <= reviewData.rating ? "#FFB800" : "#D1D5DB"}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <label htmlFor="title" className="text-sm font-medium">Review Title</label>
+              <input
+                id="title"
+                value={reviewData.title}
+                onChange={(e) => setReviewData({...reviewData, title: e.target.value})}
+                className="border p-2 rounded-md"
+                placeholder="Summarize your experience"
+              />
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <label htmlFor="comment" className="text-sm font-medium">Your Review</label>
+              <textarea
+                id="comment"
+                value={reviewData.comment}
+                onChange={(e) => setReviewData({...reviewData, comment: e.target.value})}
+                className="border p-2 rounded-md"
+                rows={4}
+                placeholder="What did you like or dislike about this product?"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>Cancel</Button>
+            <Button 
+              variant="flipkart" 
+              onClick={submitReview} 
+              disabled={!reviewData.comment || !reviewData.title}
+            >
+              Submit Review
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

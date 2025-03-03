@@ -318,10 +318,10 @@ const ProductDetail = () => {
                 <Button 
                   variant="primary" 
                   size="lg" 
-                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black inline-flex items-center justify-center"
+                  className="flex-1 bg-flipkart-yellow hover:bg-yellow-500 text-black inline-flex items-center justify-center gap-2"
                   onClick={handleAddToCart}
                 >
-                  <ShoppingCart className="h-5 w-5 mr-2" /> ADD TO CART
+                  <ShoppingCart className="h-5 w-5" /> ADD TO CART
                 </Button>
                 <Button 
                   variant="primary" 

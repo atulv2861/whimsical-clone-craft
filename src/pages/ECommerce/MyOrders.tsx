@@ -37,8 +37,42 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
+// Define types for the order items and orders
+interface OrderItem {
+  id: number;
+  name: string;
+  quantity: number;
+  price: number;
+  image: string;
+}
+
+interface DeliveryAddress {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  phone: string;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  total: number;
+  status: string;
+  paymentMethod: string;
+  items: OrderItem[];
+  deliveryAddress: DeliveryAddress;
+  // Optional properties based on order status
+  deliveryDate?: string;
+  trackingNumber?: string;
+  estimatedDelivery?: string;
+  cancellationReason?: string;
+  refundStatus?: string;
+}
+
 // Mock data for orders
-const mockOrders = [
+const mockOrders: Order[] = [
   {
     id: "ORD123456",
     date: "May 15, 2024",
@@ -169,10 +203,10 @@ const formatPrice = (price: number) => {
 const MyOrders = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState<Order[]>(mockOrders);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [orderDetailDialogOpen, setOrderDetailDialogOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
   const [filter, setFilter] = useState("all");
 
@@ -184,17 +218,17 @@ const MyOrders = () => {
     }
   };
 
-  const viewOrderDetails = (order: any) => {
+  const viewOrderDetails = (order: Order) => {
     setSelectedOrder(order);
     setOrderDetailDialogOpen(true);
   };
 
-  const trackOrder = (order: any) => {
+  const trackOrder = (order: Order) => {
     setSelectedOrder(order);
     setTrackingDialogOpen(true);
   };
 
-  const buyAgain = (items: any[]) => {
+  const buyAgain = (items: OrderItem[]) => {
     // In a real app, this would add the items to cart
     toast({
       title: "Items added to cart",
@@ -219,7 +253,7 @@ const MyOrders = () => {
     });
   };
 
-  const writeReview = (item: any) => {
+  const writeReview = (item: OrderItem) => {
     // In a real app, this would open a review form for the specific item
     toast({
       title: "Write a review",
@@ -360,7 +394,7 @@ const MyOrders = () => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="mt-2 text-flipkart-blue"
+                      className="mt-2 text-blue-600"
                       onClick={() => toggleOrderExpand(order.id)}
                     >
                       {expandedOrder === order.id ? "Show Less" : `+ ${order.items.length - 1} more item(s)`}
@@ -391,9 +425,9 @@ const MyOrders = () => {
                     </Button>
                     {order.status === "Delivered" && (
                       <Button 
-                        variant="flipkart"
+                        variant="default"
                         size="sm"
-                        className="flex items-center gap-1"
+                        className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700"
                         onClick={() => buyAgain(order.items)}
                       >
                         <RefreshCcw className="h-3 w-3" />
@@ -411,8 +445,9 @@ const MyOrders = () => {
             <h2 className="text-xl font-medium text-gray-600 mb-2">No orders yet</h2>
             <p className="text-gray-500 mb-6">When you place your first order, it will appear here</p>
             <Button 
-              variant="flipkart"
+              variant="default"
               onClick={() => navigate('/')}
+              className="bg-blue-600 hover:bg-blue-700"
             >
               Start Shopping
             </Button>
@@ -494,7 +529,7 @@ const MyOrders = () => {
                     </div>
                     <div className="flex justify-between">
                       <span>Shipping:</span>
-                      <span className="text-flipkart-green">FREE</span>
+                      <span className="text-green-600">FREE</span>
                     </div>
                     <div className="flex justify-between font-medium pt-1 border-t mt-1">
                       <span>Order Total:</span>
@@ -541,8 +576,9 @@ const MyOrders = () => {
                     </Button>
                   )}
                   <Button 
-                    variant="flipkart"
+                    variant="default"
                     size="sm"
+                    className="bg-blue-600 hover:bg-blue-700"
                     onClick={() => buyAgain(selectedOrder.items)}
                   >
                     Buy Again
@@ -572,7 +608,7 @@ const MyOrders = () => {
                 
                 <div className="relative flex items-start mb-8">
                   <div className="absolute -left-1">
-                    <div className="bg-flipkart-blue rounded-full h-10 w-10 flex items-center justify-center">
+                    <div className="bg-blue-600 rounded-full h-10 w-10 flex items-center justify-center">
                       <CheckCircle2 className="h-6 w-6 text-white" />
                     </div>
                   </div>
@@ -585,7 +621,7 @@ const MyOrders = () => {
                 
                 <div className="relative flex items-start mb-8">
                   <div className="absolute -left-1">
-                    <div className="bg-flipkart-blue rounded-full h-10 w-10 flex items-center justify-center">
+                    <div className="bg-blue-600 rounded-full h-10 w-10 flex items-center justify-center">
                       <CheckCircle2 className="h-6 w-6 text-white" />
                     </div>
                   </div>
@@ -598,7 +634,7 @@ const MyOrders = () => {
                 
                 <div className="relative flex items-start mb-8">
                   <div className="absolute -left-1">
-                    <div className="bg-flipkart-blue rounded-full h-10 w-10 flex items-center justify-center">
+                    <div className="bg-blue-600 rounded-full h-10 w-10 flex items-center justify-center">
                       <CheckCircle2 className="h-6 w-6 text-white" />
                     </div>
                   </div>
@@ -611,7 +647,7 @@ const MyOrders = () => {
                 
                 <div className="relative flex items-start">
                   <div className="absolute -left-1">
-                    <div className="bg-flipkart-blue rounded-full h-10 w-10 flex items-center justify-center">
+                    <div className="bg-blue-600 rounded-full h-10 w-10 flex items-center justify-center">
                       <CheckCircle2 className="h-6 w-6 text-white" />
                     </div>
                   </div>
@@ -632,7 +668,8 @@ const MyOrders = () => {
               Close
             </Button>
             <Button
-              variant="flipkart"
+              variant="default"
+              className="bg-blue-600 hover:bg-blue-700"
               onClick={() => contactSupport(selectedOrder?.id || "")}
             >
               Need Help?
